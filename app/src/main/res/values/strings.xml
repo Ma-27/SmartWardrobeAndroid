@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">SmartWardrobe</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
+    <string name="app_name">智能衣柜</string>
+    <string name="title_activity_login">登录Activity</string>
+    <string name="prompt_email">邮箱</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
@@ -9,4 +9,17 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+
+    <string name="navigation_drawer_open">打开导航栏</string>
+    <string name="navigation_drawer_close">关闭导航栏</string>
+    <string name="nav_header_title">用户</string>
+    <string name="nav_header_subtitle">邮箱</string>
+    <string name="nav_header_desc">导航头文件</string>
+    <string name="action_settings">设置</string>
+
+    <string name="menu_home">家居</string>
+    <string name="menu_console">控制台</string>
+    <string name="menu_datacenter">数据中心</string>
+
+    <string name="connection_succeed">连接WLAN成功</string>
 </resources>
