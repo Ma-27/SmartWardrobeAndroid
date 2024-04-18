@@ -30,9 +30,13 @@
     <color name="highlightDark">#E8D4C0</color> <!-- Darker shade for UI element shadows or pressed states -->
 
     <!-- Color for text on top of primaryColor -->
-    <color name="textOnPrimary">#FFFFFFFF</color>
+    <color name="textOnPrimary">#000000</color>
 
     <!-- App-specific colors -->
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
+
+    <color name="colorTextHint">#e1e1e1</color>
+    <color name="colorTextInfo">#9b9b9b</color>
 </resources>

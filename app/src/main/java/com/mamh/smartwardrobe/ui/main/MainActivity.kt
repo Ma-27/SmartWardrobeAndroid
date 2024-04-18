@@ -7,12 +7,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
@@ -45,28 +47,38 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //请求权限，处理权限问题
-        permissionRequest()
-
         //初始化视图布局
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        //请求权限，处理权限问题
+        permissionRequest()
+
         setListener()
 
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, binding.appBarMain.toolbar,
+            R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_console, R.id.nav_datacenter
+                R.id.nav_cloth, R.id.nav_console, R.id.nav_datacenter
             ), drawerLayout
         )
+
+        Timber.d("APP BAR CONFIGURATION: $appBarConfiguration")
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -74,21 +86,44 @@ class MainActivity : AppCompatActivity() {
     //设置点击事件和live data的监听
     @OptIn(DelicateCoroutinesApi::class)
     private fun setListener() {
+        //主界面fab按钮，fab按钮按下后，app发送数据到指定主机
+        binding.appBarMain.fab.setOnClickListener { view ->
+            showRecommendClothDetail()
+        }
+
 
     }
 
-    //点击+号fab，发送数据的界面
-    private fun showDataSendingDetail() {
+    //点击衣物符号，根据天气推荐衣物
+    private fun showRecommendClothDetail() {
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
+    //手动检查更新wifi列表，通知view model已经刷新
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            // 如果被menu被刷新
+            R.id.menu_refresh -> {
+                Timber.d("刷新菜单被按下")
+                // 通知live data改变刷新
+                // viewModel.repository.setRefreshChecked() fixme
+                return true
+            }
+        }
+
+        // User didn't trigger a refresh, let the superclass handle this action
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        return true
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
 

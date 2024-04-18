@@ -15,6 +15,7 @@ class SmartWardrobeApplication : Application() {
     //全局获取context
     companion object {
         lateinit var context: Context
+            private set // 限制外部直接修改 context 变量
 
         @JvmName("getContext1")
         fun getContext(): Context {

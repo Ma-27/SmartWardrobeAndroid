@@ -45,10 +45,6 @@
             android:label="Main Activity"
             android:parentActivityName=".ui.login.LoginActivity"
             android:theme="@style/Theme.SmartWardrobe.NoActionBar">
-
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
         </activity>
     </application>
 

@@ -17,9 +17,12 @@
     <string name="nav_header_desc">导航头文件</string>
     <string name="action_settings">设置</string>
 
-    <string name="menu_home">家居</string>
+    <string name="menu_home">衣物</string>
     <string name="menu_console">控制台</string>
     <string name="menu_datacenter">数据中心</string>
 
     <string name="connection_succeed">连接WLAN成功</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
 </resources>
