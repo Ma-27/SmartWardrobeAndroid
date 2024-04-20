@@ -39,6 +39,8 @@ class ConsoleFragment : Fragment() {
 
         setListener()
 
+        consoleViewModel.repository.test()
+
         return binding.root
     }
 

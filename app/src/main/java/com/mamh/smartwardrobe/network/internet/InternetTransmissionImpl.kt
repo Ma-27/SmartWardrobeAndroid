@@ -9,7 +9,7 @@ package com.mamh.smartwardrobe.network.internet
 
 class InternetTransmissionImpl : InternetTransmission {
     override suspend fun onReceiveData() {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun onSendData(): Int {

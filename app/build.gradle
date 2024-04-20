@@ -46,6 +46,12 @@ android {
         compose false
     }
 
+    // 可选：配置 lint 选项
+    lintOptions {
+        abortOnError true
+        checkReleaseBuilds false
+    }
+
 }
 
 dependencies {
@@ -63,6 +69,7 @@ dependencies {
     //导航
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.4.1'
+    implementation project(':onenet-sdk')
 
     //测试
     testImplementation 'junit:junit:4.13.2'
@@ -94,4 +101,7 @@ dependencies {
 
     //card view
     implementation "androidx.cardview:cardview:1.0.0"
+
+    // gson
+    implementation 'com.google.code.gson:gson:2.8.0'
 }

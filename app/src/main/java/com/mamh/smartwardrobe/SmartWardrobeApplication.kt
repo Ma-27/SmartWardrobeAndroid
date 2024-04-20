@@ -2,7 +2,10 @@ package com.mamh.smartwardrobe
 
 import android.app.Application
 import android.content.Context
+import com.chinamobile.iot.onenet.OneNetApi
+import com.chinamobile.iot.onenet.http.Config
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -36,5 +39,13 @@ class SmartWardrobeApplication : Application() {
             })
         }
         context = applicationContext
+
+        val config: Config = Config.newBuilder()
+            .connectTimeout(60000, TimeUnit.MILLISECONDS) // 连接超时时间
+            .readTimeout(60000, TimeUnit.MILLISECONDS) // 读取数据超时时间
+            .writeTimeout(60000, TimeUnit.MILLISECONDS) // 发送数据超时时间
+            .retryCount(2) // 连接失败重试次数
+            .build()
+        OneNetApi.init(this, true, config)
     }
 }

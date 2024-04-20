@@ -8,9 +8,12 @@ import com.mamh.smartwardrobe.data.AppRepository
 import timber.log.Timber
 
 class ConsoleViewModel(application: Application) : AndroidViewModel(application) {
-    private val _repository: AppRepository by lazy {
-        AppRepository.getInstanceForInternet()
-    }
+    private val _repository: AppRepository =
+        AppRepository.Builder()
+            .setInternetMode()
+            .build()
+
+
     var repository: AppRepository = _repository
 
     //缓存温度调节的目标温度
