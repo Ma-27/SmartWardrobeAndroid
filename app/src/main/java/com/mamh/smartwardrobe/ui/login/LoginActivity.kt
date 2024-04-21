@@ -13,7 +13,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.mamh.smartwardrobe.R
 import com.mamh.smartwardrobe.databinding.ActivityLoginBinding
 import com.mamh.smartwardrobe.ui.main.MainActivity
 
@@ -125,13 +124,9 @@ class LoginActivity : AppCompatActivity() {
 
     // 更新UI显示欢迎信息
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        Toast.makeText(
-            applicationContext,
-            "$welcome $displayName",
-            Toast.LENGTH_LONG
-        ).show()
+        // val welcome = getString(R.string.welcome)
+        // val displayName = model.displayName
+        // Toast.makeText(applicationContext, "$welcome $displayName", Toast.LENGTH_LONG).show()
 
         // 跳转到MainActivity
         val intent = Intent(this, MainActivity::class.java)

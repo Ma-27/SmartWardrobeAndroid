@@ -2,16 +2,15 @@ package com.mamh.smartwardrobe.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.chinamobile.iot.onenet.OneNetApi
-import com.chinamobile.iot.onenet.OneNetApiCallback
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.mamh.smartwardrobe.bean.flag.TestFlag
+import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
 import com.mamh.smartwardrobe.bean.item.DataItem
+import com.mamh.smartwardrobe.bean.item.WifiItem
 import com.mamh.smartwardrobe.network.Connection
 import com.mamh.smartwardrobe.network.NetWorkServiceFactory
 import com.mamh.smartwardrobe.network.Transmission
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
 app repository是整个app的数据中心，所有app的全局数据都暂存在这里。
@@ -71,11 +70,14 @@ class AppRepository private constructor(
      */
 
     /// SnackBar提示字符串变量
-    private val _networkStatus = MutableLiveData<String>().apply {
-        value = "向下滑动来刷新WLAN列表"
+    private val _userHint = MutableLiveData<String>().apply {
+        value = "Welcome to smart wardrobe!"
     }
-    val networkStatus: LiveData<String>
-        get() = _networkStatus
+    val userHint: LiveData<String>
+        get() = _userHint
+
+    /// 标记是否有新的刷新命令
+    private var newDataQuery = false
 
 
     //数据中心中显示的数据列表
@@ -117,15 +119,65 @@ class AppRepository private constructor(
     val targetTemperature: LiveData<Int>
         get() = _targetTemperature
 
-    // 温度控制是否自动
-    private val _temperatureControlAuto = MutableLiveData<Boolean>().apply {
+
+    // 存储当前亮度的数据
+    private val _currentBrightness = MutableLiveData<Int>().apply {
+        value = 0 // 初始化值
+    }
+    val currentBrightness: LiveData<Int>
+        get() = _currentBrightness
+
+    // 存储当前灯光开度的数据
+    private val _currentLightOpenness = MutableLiveData<Int>().apply {
+        value = 0 // 初始化值
+    }
+    val currentLightOpenness: LiveData<Int>
+        get() = _currentLightOpenness
+
+    // 存储当前湿度的数据
+    private val _currentHumidity = MutableLiveData<Int>().apply {
+        value = 0 // 初始化值
+    }
+    val currentHumidity: LiveData<Int>
+        get() = _currentHumidity
+
+    // 存储当前测量时间的数据
+    private val _currentMeasureTime = MutableLiveData<Long>().apply {
+        value = 0L // 初始化值
+    }
+    val currentMeasureTime: LiveData<Long>
+        get() = _currentMeasureTime
+
+    // 存储当前旋钮值的数据
+    private val _currentKnobValue = MutableLiveData<Int>().apply {
+        value = 0 // 初始化值
+    }
+    val currentKnobValue: LiveData<Int>
+        get() = _currentKnobValue
+
+
+    // 灯光是否开启
+    private val _lightOn = MutableLiveData<Boolean>().apply {
         value = false
     }
-    val temperatureControlAuto: LiveData<Boolean>
-        get() = _temperatureControlAuto
+    val lightOn: LiveData<Boolean>
+        get() = _lightOn
 
-    fun setTemperatureControlAuto(value: Boolean) {
-        _temperatureControlAuto.value = value
+    // 灯光控制是否自动
+    private val _lightControlAuto = MutableLiveData<Boolean>().apply {
+        value = false
+    }
+    val lightControlAuto: LiveData<Boolean>
+        get() = _lightControlAuto
+
+
+    //-------------------各自字段的setter方法--------------------------------------------------------------------------------------------------------------------------
+    fun setNewDataQuery(value: Boolean) {
+        newDataQuery = value
+    }
+
+    fun getNewDataQuery(): Boolean {
+        return newDataQuery
     }
 
     // 设置目标温度
@@ -134,19 +186,121 @@ class AppRepository private constructor(
     }
 
 
-    // FIXME DELETE LATER
-    fun test() {
-        OneNetApi.querySingleDevice(1189662413.toString(), object : OneNetApiCallback {
-            override fun onSuccess(response: String) {
-                val resp: JsonObject = JsonParser().parse(response).getAsJsonObject()
-                val errno: Int = resp.get("errno").asInt
-                Timber.d("errno: Data Received")
-                Timber.w(response)
-            }
+    fun setUserHint(value: String) {
+        _userHint.postValue(value)
+    }
 
-            override fun onFailed(e: Exception) {
-                e.printStackTrace()
-            }
-        })
+    //收到新的温度数据后，设置室温
+    fun setCurrentTemperature(temperature: Float) {
+        _currentTemperature.postValue(temperature)
+    }
+
+    // 更新温度数据的方法
+    fun updateTemperature(temperature: Float) {
+        _currentTemperature.value = temperature
+    }
+
+    // 更新亮度数据的方法
+    fun updateBrightness(brightness: Int) {
+        _currentBrightness.value = brightness
+    }
+
+    // 更新灯光开度数据的方法
+    fun updateLightOpenness(openness: Int) {
+        _currentLightOpenness.value = openness
+    }
+
+    // 更新湿度数据的方法
+    fun updateHumidity(humidity: Int) {
+        _currentHumidity.value = humidity
+    }
+
+    // 更新测量时间数据的方法
+    fun updateMeasureTime(measureTime: Long) {
+        _currentMeasureTime.value = measureTime
+    }
+
+    // 更新旋钮值数据的方法
+    fun updateKnobValue(knobValue: Int) {
+        _currentKnobValue.value = knobValue
+    }
+
+
+// ----------------------------------------------------------------
+
+
+    //更改接收缓存，提示收到数据了
+    fun setDataReceiveCache(data: String) {
+        _dataReceiveCache.postValue(data)
+        //Timber.d("接收缓存收到数据$data")
+    }
+
+    //更改发送缓存，发送缓存收到更改后，应安排发送数据
+    fun setDataSendCache(data: String) {
+        _dataSendCache.postValue(data)
+    }
+
+    //在数据中心的数据列表中添加数据
+    // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
+    fun addDataItemToList(dataItem: DataItem) {
+        mdataList.add(dataItem)
+        _dataList.postValue(mdataList)
+    }
+
+
+    /***
+     * 预留其他类access该类并修改数据的接口，通常从view model类中access此类
+     */
+    //检查网络状态
+    fun checkNetWorkState() {
+        //调用网络模块进行刷新
+        connection?.checkNetworkState()
+    }
+
+    //连接到指定wifi，wifiItem中含有wifi参数
+    fun connectToSpecifiedWifi(item: WifiItem) {
+        connection?.connect(item)
+    }
+
+    //断开与现在的wifi的连接
+    fun disConnectWifi() {
+        connection?.disconnect()
+    }
+
+    //提醒repository，设备已经接收到网络发来的数据了
+    suspend fun notifyDataReceiving() {
+        /// 启动一个新的接收数据线程
+        withContext(Dispatchers.IO) {
+            transmission?.onReceiveData()
+        }
+    }
+
+    //提醒repository socket已经改变
+    suspend fun notifySocketChanged() {
+        //在本app中，socket是连接的最后一步，如果成功生成或者更改了socket，则可以监听数据发送，这里需要提示刷新数据
+        notifyDataReceiving()
+    }
+
+    //向目标主机发送数据
+    suspend fun sendDataToServer() {
+        withContext(Dispatchers.IO) {
+            //发送数据
+            val status = transmission?.onSendData()
+            //报告发送状态
+            setUserHint(
+                when (status) {
+                    TransmissionStatus.SUCCESS -> "数据发送成功"
+                    TransmissionStatus.FAIL -> "数据发送失败"
+                    TransmissionStatus.SOCKET_NULL -> "端口为空"
+                    TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
+                    TransmissionStatus.DEVICE_NOT_ONLINE -> "设备不在线，请检查设备的电源或网络"
+                    TransmissionStatus.INVALID_JSON -> "服务器似乎返回了无效的数据"
+                    TransmissionStatus.UNKNOWN -> "未知的网络请求状态"
+                    else -> {
+                        "未知的网络请求状态"
+                    }
+                }
+            )
+        }
     }
 }

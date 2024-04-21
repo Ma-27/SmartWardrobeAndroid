@@ -13,5 +13,9 @@ class TransmissionStatus {
         const val SOCKET_NULL = 4
 
         const val UNCONNECTED = 5
+
+        const val DEVICE_NOT_ONLINE = 6
+
+        const val INVALID_JSON = 7
     }
 }
