@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_cloth">
+
+    <fragment
+        android:id="@+id/nav_cloth"
+        android:name="com.mamh.smartwardrobe.ui.cloth.ClothFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_cloth" />
+
+    <fragment
+        android:id="@+id/nav_console"
+        android:name="com.mamh.smartwardrobe.ui.console.ConsoleFragment"
+        android:label="@string/menu_console"
+        tools:layout="@layout/fragment_console" />
+
+    <fragment
+        android:id="@+id/nav_datacenter"
+        android:name="com.mamh.smartwardrobe.ui.datacenter.DataCenterFragment"
+        android:label="@string/menu_datacenter"
+        tools:layout="@layout/fragment_datacenter" />
+</navigation>

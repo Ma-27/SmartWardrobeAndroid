@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SmartWardrobe"
 include ':app'
+include ':onenet-sdk'

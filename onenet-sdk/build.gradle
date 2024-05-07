@@ -1,0 +1,34 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 34  // 指定编译使用的 SDK 版本
+
+    defaultConfig {
+        minSdkVersion 21  // 最低支持的 Android 版本
+        targetSdkVersion 34  // 目标 Android 版本
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // 可选：配置 lint 选项
+    lintOptions {
+        abortOnError true
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    api libs.okhttp
+    api libs.logging.interceptor
+}
+
+// 可选：配置编译选项
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

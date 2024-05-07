@@ -9,6 +9,7 @@ buildscript {
         gradleVersion = '4.0.1'
         navigationVersion = '2.5.3'
         dataBindingCompilerVersion = gradleVersion // Always need to be the same.
+        androidGradlePluginVersion = '7.3.1'
     }
 
     repositories {
@@ -20,6 +21,8 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
+        classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
+        // 添加 Android Gradle Plugin
     }
 }
 

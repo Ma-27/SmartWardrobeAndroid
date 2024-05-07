@@ -1,6 +1,7 @@
 package com.mamh.smartwardrobe.ui.login
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,8 +13,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.mamh.smartwardrobe.R
 import com.mamh.smartwardrobe.databinding.ActivityLoginBinding
+import com.mamh.smartwardrobe.ui.main.MainActivity
 
 // 主Activity类用于处理登录
 class LoginActivity : AppCompatActivity() {
@@ -68,8 +69,8 @@ class LoginActivity : AppCompatActivity() {
             }
             setResult(Activity.RESULT_OK)
 
-            // 登录成功后关闭Activity FIXME
-            // finish()
+            // 登录成功后关闭Activity
+            finish()
         })
 
         // 用户名文本变更监听
@@ -123,16 +124,13 @@ class LoginActivity : AppCompatActivity() {
 
     // 更新UI显示欢迎信息
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        Toast.makeText(
-            applicationContext,
-            "$welcome $displayName",
-            Toast.LENGTH_LONG
-        ).show()
+        // val welcome = getString(R.string.welcome)
+        // val displayName = model.displayName
+        // Toast.makeText(applicationContext, "$welcome $displayName", Toast.LENGTH_LONG).show()
 
-        // TODO
-
+        // 跳转到MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     // 显示登录失败的Toast

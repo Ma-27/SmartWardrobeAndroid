@@ -2,7 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--获取网络状态权限-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!--提供获取位置权限才能访问当前的位置获取附近的wifi-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--修改wifi连接状态权限-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+
     <application
+        android:name=".SmartWardrobeApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,14 +31,48 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat"
         tools:targetApi="31">
+
+        <!-- OneNET product api-key -->
+        <meta-data
+            android:name="com.chinamobile.iot.onenet.APP-KEY"
+            android:value="qgV=z2t6iT0oBcubqpKaNJZC8Dw=" />
+
+        <!-- OneNET api scheme -->
+        <meta-data
+            android:name="com.chinamobile.iot.onenet.SCHEME"
+            android:value="https" />
+
+        <!-- OneNET server host -->
+        <meta-data
+            android:name="com.chinamobile.iot.onenet.HOST"
+            android:value="api.heclouds.com" />
+
+        <!-- amap key -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="4e2fe593c634eadd057ce8da84f3d638" />
+
+
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true"
-            android:label="@string/title_activity_login" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SmartWardrobe.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:label="Main Activity"
+            android:parentActivityName=".ui.login.LoginActivity"
+            android:theme="@style/Theme.SmartWardrobe.NoActionBar">
         </activity>
     </application>
 
