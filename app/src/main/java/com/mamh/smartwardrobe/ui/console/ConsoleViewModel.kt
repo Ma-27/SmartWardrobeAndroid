@@ -17,8 +17,45 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
             .build()
     var repository: AppRepository = _repository
 
+    /// ------------------------- 其他网络API数据和服务数据部分 --------------------------------------------------------
+    // 经纬度信息，默认值为空字符串
+    private val _latlng = MutableLiveData<String>("")
+    val latlng: LiveData<String>
+        get() = _latlng
 
-    //缓存温度调节的目标温度
+    // 空气湿度，默认值为
+    private val _airHumidity = MutableLiveData<Int>(0)
+    val airHumidity: LiveData<Int>
+        get() = _airHumidity
+
+    // PM指数，默认值为0
+    private val _pmIndex = MutableLiveData<Int>(0)
+    val pmIndex: LiveData<Int>
+        get() = _pmIndex
+
+    // 温度，默认值为18°C
+    private val _weatherForecastTemperature = MutableLiveData<Int>(18)
+    val weatherForecastTemperature: LiveData<Int>
+        get() = _weatherForecastTemperature
+
+    // 位置，默认值为"Unknown location"
+    private val _location = MutableLiveData<String>("Unknown location")
+    val location: LiveData<String>
+        get() = _location
+
+    // 天气状况，默认值为"Sunny"
+    private val _weatherCondition = MutableLiveData<String>("Sunny")
+    val weatherCondition: LiveData<String>
+        get() = _weatherCondition
+
+    // 穿衣建议，默认值为"Standard attire"
+    private val _clothingSuggestion = MutableLiveData<String>("Standard attire")
+    val clothingSuggestion: LiveData<String>
+        get() = _clothingSuggestion
+
+
+    /// ---------------------------- 传感器数据部分 --------------------------------------------------------
+    // 缓存温度调节的目标温度
     private val _targetTemperature = _repository.targetTemperature
     val targetTemperature: LiveData<Int>
         get() = _targetTemperature
@@ -59,6 +96,9 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
     val temperatureControlAuto: LiveData<Boolean>
         get() = _temperatureControlAuto
 
+
+    /// ---------------------------- setter部分 --------------------------------------------------------
+
     // 设置目标温度
     fun setTargetTemperature() {
         Timber.d("设置目标温度为${pendingTemperature.value}")
@@ -70,6 +110,33 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
         _pendingTemperature.value = temperature
     }
 
+    // Setter 方法，允许外部更新LiveData的值
+    fun setHumidity(value: Int) {
+        _airHumidity.value = value
+    }
+
+    fun setPmIndex(value: Int) {
+        _pmIndex.value = value
+    }
+
+    fun setTemperature(value: Int) {
+        _weatherForecastTemperature.value = value
+    }
+
+    fun setLocation(value: String) {
+        _location.value = value
+    }
+
+    fun setWeatherCondition(value: String) {
+        _weatherCondition.value = value
+    }
+
+    fun setClothingSuggestion(value: String) {
+        _clothingSuggestion.value = value
+    }
+
+
+    /// ---------------------------- 处理逻辑 --------------------------------------------------------
     //向目标主机发送数据
     fun sendData(data: String) {
         //构建数据对象

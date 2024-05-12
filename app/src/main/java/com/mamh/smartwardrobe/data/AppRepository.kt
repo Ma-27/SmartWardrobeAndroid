@@ -6,11 +6,15 @@ import com.mamh.smartwardrobe.bean.flag.TestFlag
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
 import com.mamh.smartwardrobe.bean.item.DataItem
 import com.mamh.smartwardrobe.bean.item.WifiItem
+import com.mamh.smartwardrobe.bean.netpacket.DailyWeatherResponse
+import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
 import com.mamh.smartwardrobe.network.Connection
 import com.mamh.smartwardrobe.network.NetWorkServiceFactory
 import com.mamh.smartwardrobe.network.Transmission
+import com.mamh.smartwardrobe.network.internet.CaiyunWeatherApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
 app repository是整个app的数据中心，所有app的全局数据都暂存在这里。
@@ -33,6 +37,8 @@ class AppRepository private constructor(
                 }
             }
         }
+
+        private val WEATHER_API_TOKEN = "9XGgTK1gcGYEy4Ic"
     }
 
 
@@ -65,16 +71,17 @@ class AppRepository private constructor(
 
 
     /**
-     * --------------------------------------------------------------------------------------------------------------------------------------------------------
-     * 这里正式进入存储数据的部分
+     * --------------------这里正式进入存储数据的部分-----------------------------------------------------------------
      */
 
     /// SnackBar提示字符串变量
     private val _userHint = MutableLiveData<String>().apply {
-        value = "Welcome to smart wardrobe!"
+        value = "欢迎使用智能衣柜!"
     }
     val userHint: LiveData<String>
         get() = _userHint
+
+    /// ------------------------- 互联网-物联网数据传输控制部分------------------------------------------------------------------------------------------------------------
 
     /// 标记是否有新的刷新命令
     private var newDataQuery = false
@@ -103,6 +110,21 @@ class AppRepository private constructor(
     }
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
+
+
+    /// ------------------------- 其他网络API和服务部分--------------------------------------------------------------------
+    //要发送的数据缓存（相比起数据列表更容易access）
+    private val _latlng = MutableLiveData<String>().apply {
+        //默认值为TestFlag.SEND
+        value = "106.5518,29.7425"
+
+    }
+    val latlng: LiveData<String>
+        get() = _latlng
+
+
+    /// ------------------------- 传感器数据部分--------------------------------------------------------------------
+
 
     //缓存温度调节的当前温度
     private val _currentTemperature = MutableLiveData<Float>().apply {
@@ -171,7 +193,12 @@ class AppRepository private constructor(
         get() = _lightControlAuto
 
 
-    //-------------------各自字段的setter方法--------------------------------------------------------------------------------------------------------------------------
+    /**
+     * =========================各自字段的setter方法===================================================================================
+     */
+
+    /// --------------------- 互联网-物联网数据传输控制部分-----------------------------------------------------------------------------
+
     fun setNewDataQuery(value: Boolean) {
         newDataQuery = value
     }
@@ -179,55 +206,6 @@ class AppRepository private constructor(
     fun getNewDataQuery(): Boolean {
         return newDataQuery
     }
-
-    // 设置目标温度
-    fun setTargetTemperature(temperature: Int) {
-        _targetTemperature.value = temperature
-    }
-
-
-    fun setUserHint(value: String) {
-        _userHint.postValue(value)
-    }
-
-    //收到新的温度数据后，设置室温
-    fun setCurrentTemperature(temperature: Float) {
-        _currentTemperature.postValue(temperature)
-    }
-
-    // 更新温度数据的方法
-    fun updateTemperature(temperature: Float) {
-        _currentTemperature.value = temperature
-    }
-
-    // 更新亮度数据的方法
-    fun updateBrightness(brightness: Int) {
-        _currentBrightness.value = brightness
-    }
-
-    // 更新灯光开度数据的方法
-    fun updateLightOpenness(openness: Int) {
-        _currentLightOpenness.value = openness
-    }
-
-    // 更新湿度数据的方法
-    fun updateHumidity(humidity: Int) {
-        _currentHumidity.value = humidity
-    }
-
-    // 更新测量时间数据的方法
-    fun updateMeasureTime(measureTime: Long) {
-        _currentMeasureTime.value = measureTime
-    }
-
-    // 更新旋钮值数据的方法
-    fun updateKnobValue(knobValue: Int) {
-        _currentKnobValue.value = knobValue
-    }
-
-
-// ----------------------------------------------------------------
-
 
     //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
@@ -248,9 +226,7 @@ class AppRepository private constructor(
     }
 
 
-    /***
-     * 预留其他类access该类并修改数据的接口，通常从view model类中access此类
-     */
+    /// 预留其他类access该类并修改数据的接口，通常从view model类中access此类
     //检查网络状态
     fun checkNetWorkState() {
         //调用网络模块进行刷新
@@ -302,5 +278,131 @@ class AppRepository private constructor(
                 }
             )
         }
+    }
+
+
+    /// ------------------------- 其他网络API和服务部分--------------------------------------------------------------------
+
+    // 更新经纬度
+    fun setLatLng(value: String) {
+        _latlng.postValue(value)
+    }
+
+
+    /// ------------------------其他网络API和服务部分----------------------------------------
+
+    // 向服务器请求天气数据
+    suspend fun updateWeatherFromRemote(): UsefulDailyWeatherDetail? {
+        // 使用Dispatchers.IO确保网络请求在IO线程执行
+        return withContext(Dispatchers.IO) {
+            try {
+                // 获取每日天气
+                // latlng.value!! 必不为空
+                val dailyWeatherResponse: DailyWeatherResponse? =
+                    CaiyunWeatherApi.retrofitService.getDailyWeather(
+                        WEATHER_API_TOKEN,
+                        latlng.value!!
+                    )
+
+                dailyWeatherResponse?.let {
+                    Timber.d("成功获取当日天气数据: $it")
+                    extractDailyWeatherDetails(it)
+
+                } ?: run {
+                    Timber.e("获取天气数据失败: 响应为空")
+                    null
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "获取天气数据时出错")
+                null
+            }
+        }
+    }
+
+
+    //  提取天气API中每日需要的数据
+    private fun extractDailyWeatherDetails(response: DailyWeatherResponse): UsefulDailyWeatherDetail {
+        val location = "Lat: ${response.location[0]}, Lon: ${response.location[1]}"
+
+        val temperature = response.result.daily.temperature.firstOrNull()
+        val temperatureMax = temperature?.max?.toInt() ?: 0
+        val temperatureMin = temperature?.min?.toInt() ?: 0
+        val temperatureAvg = temperature?.avg?.toInt() ?: 0
+
+        val humidity = response.result.daily.humidity.firstOrNull()
+        val humidityMax = (humidity?.max ?: 0).toInt()
+        val humidityMin = (humidity?.min ?: 0).toInt()
+        val humidityAvg = (humidity?.avg ?: 0).toInt()
+
+        val pm25 = response.result.daily.air_quality.pm25.firstOrNull()
+        val pm25Max = pm25?.max ?: 0
+        val pm25Min = pm25?.min ?: 0
+        val pm25Avg = (pm25?.avg ?: 0).toInt()
+
+        val dressing = response.result.daily.life_index.dressing.firstOrNull()
+        val dressingIndex = dressing?.index?.toInt() ?: 0
+        val dressingAdvice = dressing?.desc ?: ""
+
+        val skycon = response.result.daily.skycon.firstOrNull()
+        val weatherCondition = skycon?.value ?: "Not available"
+
+        return UsefulDailyWeatherDetail(
+            location = location,
+            temperature = temperatureAvg,
+            humidity = humidityAvg,
+            pm25 = pm25Avg,
+            dressingIndex = dressingIndex,
+            dressingAdvice = dressingAdvice,
+            weatherCondition = weatherCondition
+        )
+    }
+
+
+    /// ------------------------- 传感器数据部分-----------------------------------------------------------------------------
+
+
+    // 设置目标温度
+    fun setTargetTemperature(temperature: Int) {
+        _targetTemperature.value = temperature
+    }
+
+
+    fun setUserHint(value: String) {
+        _userHint.postValue(value)
+    }
+
+    //收到新的温度数据后，设置室温
+    fun setCurrentTemperature(temperature: Float) {
+        _currentTemperature.postValue(temperature)
+    }
+
+    // 更新温度数据的方法
+    fun updateTemperature(temperature: Float) {
+        _currentTemperature.value = temperature
+    }
+
+    // 更新亮度数据的方法
+    fun updateBrightness(brightness: Int) {
+        _currentBrightness.value = brightness
+    }
+
+    // 更新灯光开度数据的方法
+    fun updateLightOpenness(openness: Int) {
+        _currentLightOpenness.value = openness
+    }
+
+    // 更新湿度数据的方法
+    fun updateHumidity(humidity: Int) {
+        _currentHumidity.value = humidity
+    }
+
+    // 更新测量时间数据的方法
+    fun updateMeasureTime(measureTime: Long) {
+        _currentMeasureTime.value = measureTime
+    }
+
+    // 更新旋钮值数据的方法
+    fun updateKnobValue(knobValue: Int) {
+        _currentKnobValue.value = knobValue
     }
 }

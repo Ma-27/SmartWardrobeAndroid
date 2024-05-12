@@ -1,10 +1,19 @@
 package com.mamh.smartwardrobe.ui.console
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +27,9 @@ import java.util.concurrent.CountDownLatch
 
 
 class ConsoleFragment : Fragment() {
+    // 定义请求位置权限的请求代码
+    private val LOCATION_REQUEST_CODE = 106
+
 
     private var _binding: FragmentConsoleBinding? = null
 
@@ -61,9 +73,78 @@ class ConsoleFragment : Fragment() {
                 Timber.d("下拉刷新触发")
                 consoleViewModel.repository.setNewDataQuery(true)
                 consoleViewModel.repository.transmission?.onReceiveData()
+
+                val connMgr: ConnectivityManager? =
+                    requireActivity().application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+                var networkInfo: NetworkInfo? = null
+
+                if (connMgr != null) {
+                    networkInfo = connMgr.activeNetworkInfo
+                }
+
+                if (networkInfo != null && networkInfo.isConnected) {
+                    // 请求新的经纬度
+                    if (ActivityCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // 请求权限
+                        ActivityCompat.requestPermissions(
+                            requireActivity(),
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            ),
+                            LOCATION_REQUEST_CODE
+                        )
+                    } else {
+                        val locationManager =
+                            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                        locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            0,
+                            0f,
+                            object :
+                                LocationListener {
+                                override fun onLocationChanged(location: Location) {
+                                    // 获取到位置信息后，在这里执行获取新经纬度的操作
+                                    val formattedLatLng =
+                                        String.format(
+                                            "%.4f,%.4f",
+                                            location.longitude,
+                                            location.latitude
+                                        )
+
+                                    Timber.d(formattedLatLng.toString())
+
+                                    // 更新viewmodel中latlng的新值
+                                    consoleViewModel.repository.setLatLng(formattedLatLng)
+                                    // 移除位置更新，避免重复获取位置数据
+                                    locationManager.removeUpdates(this)
+                                }
+
+                                override fun onStatusChanged(
+                                    provider: String?,
+                                    status: Int,
+                                    extras: Bundle?
+                                ) {
+                                }
+
+                                override fun onProviderEnabled(provider: String) {}
+                                override fun onProviderDisabled(provider: String) {}
+                            })
+                    }
+                }
+                // 这里先不更新天气，因为数据没有更新
+                binding.swipeRefreshLayout.isRefreshing = false
             }
-            binding.swipeRefreshLayout.isRefreshing = false
         }
+
 
         //温度控制系统打开按钮监听
         binding.switchTemperature.setOnCheckedChangeListener { compoundButton, b ->
@@ -122,7 +203,7 @@ class ConsoleFragment : Fragment() {
 
             // 转换为JSON字符串并发送
             consoleViewModel.sendData(lightControlCommand.toJsonString())
-            
+
             // 启用 Switch
             compoundButton.isEnabled = true
         }
@@ -161,6 +242,32 @@ class ConsoleFragment : Fragment() {
 
             }
         })
+
+        // 观察经纬度信息，如果经纬度变了，才刷新
+        consoleViewModel.repository.latlng.observe(viewLifecycleOwner, object : Observer<String> {
+            private var lastObservedLatLng = ""
+            override fun onChanged(newLatLng: String) {
+                // 检查新的经纬度是否与上一次观察到的不同
+                if (newLatLng != lastObservedLatLng) {
+                    // 更新最后观察到的经纬度
+                    lastObservedLatLng = newLatLng
+
+                    // 经纬度有变化，从云端API更新天气数据
+                    lifecycleScope.launch {
+                        consoleViewModel.repository.updateWeatherFromRemote()?.let {
+                            // 通过函数更新每个LiveData的值
+                            consoleViewModel.setHumidity(it.humidity)
+                            consoleViewModel.setPmIndex(it.pm25)
+                            consoleViewModel.setTemperature(it.temperature)  // 假设温度后有°C，去除它并转换为整数
+                            consoleViewModel.setLocation(it.location)
+                            consoleViewModel.setWeatherCondition(it.weatherCondition)
+                            consoleViewModel.setClothingSuggestion(it.dressingAdvice)
+                        }
+                    }
+                }
+            }
+        })
+
 
     }
 
