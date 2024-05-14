@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mamh.smartwardrobe.databinding.ActivityLoginBinding
 import com.mamh.smartwardrobe.ui.main.MainActivity
 
+
 // 主Activity类用于处理登录
 class LoginActivity : AppCompatActivity() {
 

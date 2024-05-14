@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 背景颜色层 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/background_green" /> <!-- 背景颜色 -->
+        </shape>
+    </item>
+
+    <!-- 圆角白色区域 -->
+    <item
+        android:left="6dp"
+        android:right="6dp"
+        android:top="6dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" /> <!-- 白色填充 -->
+            <corners
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"
+                android:topLeftRadius="32dp"
+                android:topRightRadius="32dp" />
+        </shape>
+    </item>
+
+    <!-- 绿色边框 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="6dp"
+                android:color="@color/green_heavy" /> <!-- 绿色边框 -->
+            <corners
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"
+                android:topLeftRadius="32dp"
+                android:topRightRadius="32dp" />
+        </shape>
+    </item>
+
+</layer-list>

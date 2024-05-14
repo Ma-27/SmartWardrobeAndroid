@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFC107" /> <!-- 按钮内部的颜色 -->
+    <corners android:radius="24dp" /> <!-- 按钮的圆角大小 -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/green_heavy" />
+</shape>

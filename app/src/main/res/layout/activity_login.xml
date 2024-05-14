@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -8,89 +8,215 @@
     android:background="@color/background"
     tools:context=".ui.login.LoginActivity">
 
-    <!-- 添加绿色的顶部图像 -->
-    <ImageView
-        android:id="@+id/topImage"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:src="@drawable/hello_wardrobe"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/background_green">
 
-    <!-- 容器 -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="32dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        >
+        <!-- 添加绿色的顶部图像 -->
+        <ImageView
+            android:id="@+id/topImage"
+            android:layout_width="0dp"
+            android:layout_height="300dp"
+            android:src="@drawable/hello_wardrobe"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!-- 容器 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/background_green"
+            android:padding="32dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/rounded_top_corners">
 
-            <!-- 用户名输入框 -->
-            <EditText
-                android:id="@+id/edit_username"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:hint="登录"
-                android:inputType="text|phone"
-                android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- 密码输入框 -->
-            <EditText
-                android:id="@+id/edit_password"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:hint="密码"
-                android:inputType="textPassword"
-                android:padding="16dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/edit_username" />
-
-            <!-- 登录按钮 -->
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:text="登录"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toTopOf="@id/btn_tourist_mode"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/edit_password" />
-
-            <!-- 游客模式按钮 -->
-            <Button
-                android:id="@+id/btn_tourist_mode"
-                android:layout_width="0dp"
-                android:layout_height="75dp"
-                android:text="游客模式"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_login" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/tv_input_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="36dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="6dp"
+                    android:fontFamily="serif"
+                    android:padding="8dp"
+                    android:text="登录"
+                    android:textColor="@color/green_heavy"
+                    android:textSize="22sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_input_username"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tv_input_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="32dp"
+                    android:fontFamily="serif"
+                    android:padding="@dimen/space10"
+                    android:text="用户名"
+                    android:textColor="@color/green_heavy"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toTopOf="@+id/ll_et_username"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- 用户名输入框和登录按钮 -->
+                <LinearLayout
+                    android:id="@+id/ll_et_username"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@drawable/rounded_background"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_input_password"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <EditText
+                        android:id="@+id/edit_username"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space10"
+                        android:layout_weight="1"
+                        android:background="@drawable/edittext_no_underline"
+                        android:drawableStart="@drawable/ic_dialog_email"
+                        android:drawablePadding="10dp"
+                        android:hint="username@email.com"
+                        android:padding="8dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/green_moderate"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_input_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="32dp"
+                    android:fontFamily="serif"
+                    android:padding="@dimen/space10"
+                    android:text="密码"
+                    android:textColor="@color/green_heavy"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toTopOf="@+id/ll_et_password"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- 密码输入框和登录按钮 -->
+                <LinearLayout
+                    android:id="@+id/ll_et_password"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/rounded_background"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toTopOf="@id/ll_agreement"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <EditText
+                        android:id="@+id/edit_password"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space10"
+                        android:layout_marginBottom="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/edittext_no_underline"
+                        android:drawableStart="@drawable/ic_lock_light"
+                        android:drawablePadding="10dp"
+                        android:hint="*********"
+                        android:padding="8dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/green_moderate"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/btn_retake_password"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/rounded_button_background"
+                        android:fontFamily="serif"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/space20"
+                        android:paddingEnd="@dimen/space20"
+                        android:text="找回密码"
+                        android:textColor="@android:color/white"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
+
+                <!-- 同意隐私条款容器 -->
+                <LinearLayout
+                    android:id="@+id/ll_agreement"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toTopOf="@id/btn_login"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_agree"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="serif"
+                        android:text="同意《隐私条款》"
+                        android:textColor="@color/green_heavy"
+                        android:textSize="16sp"
+                        android:theme="@style/CheckBoxTheme" />
+                </LinearLayout>
+
+
+                <!-- 登录按钮 -->
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="108dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_button"
+                    android:text="登录"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/btn_tourist_mode"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+
+                <TextView
+                    android:id="@+id/btn_tourist_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space15"
+                    android:layout_marginBottom="32dp"
+                    android:background="@android:color/white"
+                    android:clickable="true"
+                    android:fontFamily="serif"
+                    android:text="使用游客身份进入"
+                    android:textColor="@color/green_heavy"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

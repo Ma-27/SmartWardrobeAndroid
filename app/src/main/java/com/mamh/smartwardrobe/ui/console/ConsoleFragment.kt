@@ -1,6 +1,7 @@
 package com.mamh.smartwardrobe.ui.console
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -10,6 +11,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
@@ -64,6 +66,7 @@ class ConsoleFragment : Fragment() {
     }
 
     //创建各个控件的点击响应监听和变量状态改变监听
+    @SuppressLint("ClickableViewAccessibility")
     @OptIn(DelicateCoroutinesApi::class)
     private fun setListener() {
         // 设置SwipeRefreshLayout的下拉刷新监听
@@ -209,6 +212,23 @@ class ConsoleFragment : Fragment() {
         }
 
 
+        binding.sbTemperature.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 当用户开始触摸 `SeekBar` 时，请求不拦截触摸事件
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    // 当用户停止触摸 `SeekBar` 时，允许拦截触摸事件
+                    v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            // false 让 `SeekBar` 的原生触摸功能正常处理
+            false
+        }
+
+
         //
         binding.sbTemperature.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             var temperature: Int = 15
@@ -253,6 +273,8 @@ class ConsoleFragment : Fragment() {
                     lastObservedLatLng = newLatLng
 
                     // 经纬度有变化，从云端API更新天气数据
+
+                    /*
                     lifecycleScope.launch {
                         consoleViewModel.repository.updateWeatherFromRemote()?.let {
                             // 通过函数更新每个LiveData的值
@@ -264,6 +286,10 @@ class ConsoleFragment : Fragment() {
                             consoleViewModel.setClothingSuggestion(it.dressingAdvice)
                         }
                     }
+
+                     */
+
+                    // fixme
                 }
             }
         })
