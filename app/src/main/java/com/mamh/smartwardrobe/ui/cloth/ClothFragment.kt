@@ -50,7 +50,9 @@ class ClothFragment : Fragment() {
         binding.swContainer.setOnRefreshListener {
             //下拉刷新时，重新刷新衣物数据
             // 这里先不更新天气，因为数据没有更新
-            binding.swContainer.isRefreshing = false
+            binding.swContainer.isRefreshing = true
+
+            binding.viewmodel!!.repository.setUserHint("智能衣柜数据已刷新")
         }
     }
 
