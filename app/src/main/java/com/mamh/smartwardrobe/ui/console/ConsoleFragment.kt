@@ -145,6 +145,7 @@ class ConsoleFragment : Fragment() {
                 }
                 // 这里先不更新天气，因为数据没有更新
                 binding.swipeRefreshLayout.isRefreshing = false
+                binding.viewmodel!!.repository.setUserHint("智能衣柜数据已刷新")
             }
         }
 
@@ -212,6 +213,7 @@ class ConsoleFragment : Fragment() {
         }
 
 
+        // 处理视图派遣冲突
         binding.sbTemperature.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -274,20 +276,25 @@ class ConsoleFragment : Fragment() {
 
                     // 经纬度有变化，从云端API更新天气数据
 
-                    /*
+
                     lifecycleScope.launch {
+                        /*
                         consoleViewModel.repository.updateWeatherFromRemote()?.let {
                             // 通过函数更新每个LiveData的值
+
                             consoleViewModel.setHumidity(it.humidity)
                             consoleViewModel.setPmIndex(it.pm25)
                             consoleViewModel.setTemperature(it.temperature)  // 假设温度后有°C，去除它并转换为整数
                             consoleViewModel.setLocation(it.location)
                             consoleViewModel.setWeatherCondition(it.weatherCondition)
                             consoleViewModel.setClothingSuggestion(it.dressingAdvice)
+
+
                         }
+
+                         */
                     }
 
-                     */
 
                     // fixme
                 }

@@ -61,6 +61,8 @@ class InternetTransmissionImpl : InternetTransmission {
         withContext(Dispatchers.IO) {
             latch.await()
         }  // 等待所有操作完成
+        Timber.d("Send Data status: $status")
+        Timber.d("Send Data: $dataOut")
         return status
     }
 
