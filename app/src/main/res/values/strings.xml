@@ -19,7 +19,7 @@
 
     <string name="menu_home">衣物</string>
     <string name="menu_console">控制台</string>
-    <string name="menu_datacenter">数据中心</string>
+    <string name="menu_datacenter">衣物</string>
 
     <string name="connection_succeed">连接WLAN成功</string>
     <string name="title_activity_test">TestActivity</string>

@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="衣物名称："
+            android:textIsSelectable="true"
             android:textSize="18sp" />
 
         <EditText
@@ -36,6 +37,7 @@
             android:layout_below="@id/et_add_cloth_name"
             android:layout_marginTop="16dp"
             android:text="衣物颜色："
+            android:textIsSelectable="true"
             android:textSize="18sp" />
 
         <Spinner
@@ -53,6 +55,7 @@
             android:layout_below="@id/spinner_colors"
             android:layout_marginTop="16dp"
             android:text="衣物款式："
+            android:textIsSelectable="true"
             android:textSize="18sp" />
 
         <EditText
@@ -71,6 +74,7 @@
             android:layout_below="@id/et_cloth_style"
             android:layout_marginTop="16dp"
             android:text="衣物材质："
+            android:textIsSelectable="true"
             android:textSize="18sp" />
 
         <EditText
@@ -89,6 +93,7 @@
             android:layout_below="@id/et_material"
             android:layout_marginTop="16dp"
             android:text="衣物尺寸："
+            android:textIsSelectable="true"
             android:textSize="18sp" />
 
         <EditText

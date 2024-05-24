@@ -66,6 +66,7 @@
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -84,6 +85,7 @@
                             app:layout_constraintEnd_toEndOf="@+id/tv_humidity_hint"
                             app:layout_constraintHorizontal_bias="0.488"
                             app:layout_constraintStart_toStartOf="@+id/tv_humidity_hint"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_humidity_hint" />
 
                         <TextView
@@ -98,6 +100,7 @@
                             android:textColor="#FFFFFF"
                             android:textSize="32sp"
                             app:layout_constraintEnd_toEndOf="@+id/textView4"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
                         <TextView
@@ -112,6 +115,7 @@
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
@@ -128,6 +132,7 @@
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -178,6 +183,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
                         <TextView
@@ -194,6 +200,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined1" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -258,6 +265,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/iv_temperature_photo" />
 
                         <TextView
@@ -273,6 +281,7 @@
                             android:layout_marginTop="3dp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined2" />
 
                         <TextView
@@ -289,6 +298,7 @@
                             app:layout_constraintBottom_toTopOf="@+id/tv_temperature_setting"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_temperature_home" />
 
                         <TextView
@@ -304,6 +314,7 @@
                             android:layout_marginTop="3dp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined3" />
 
                         <Switch
@@ -414,6 +425,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_humidity"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
@@ -429,6 +441,7 @@
                             android:textColor="@color/white"
                             app:layout_constraintEnd_toEndOf="@+id/tv_undefined4"
                             app:layout_constraintStart_toStartOf="@+id/tv_undefined4"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined4" />
 
                         <TextView
@@ -444,6 +457,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/tv_humidity_value"
                             app:layout_constraintStart_toStartOf="@+id/tv_humidity_value"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_humidity_value" />
 
                         <TextView
@@ -459,6 +473,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/tv_undefined7"
                             app:layout_constraintStart_toStartOf="@+id/tv_undefined7"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined7" />
 
 
@@ -571,6 +586,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_lock"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <Switch
@@ -644,6 +660,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_light"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <Switch
@@ -675,6 +692,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_light"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@id/switch_light" />
 
                         <Switch

@@ -37,6 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/iv_item_image_cloth"
+            android:textIsSelectable="true"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -50,6 +51,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@id/item_cloth_title"
+            android:textIsSelectable="true"
             app:layout_constraintTop_toBottomOf="@id/item_cloth_title" />
 
         <TextView
@@ -62,6 +64,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@android:color/darker_gray"
             app:layout_constraintStart_toStartOf="@id/item_description"
+            android:textIsSelectable="true"
             app:layout_constraintTop_toBottomOf="@id/item_description" />
 
         <TextView

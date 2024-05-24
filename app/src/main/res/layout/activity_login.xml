@@ -55,6 +55,7 @@
                     android:textSize="22sp"
                     app:layout_constraintBottom_toTopOf="@+id/tv_input_username"
                     app:layout_constraintStart_toStartOf="parent"
+                    android:textIsSelectable="true"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -69,6 +70,7 @@
                     android:textColor="@color/green_heavy"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@+id/ll_et_username"
+                    android:textIsSelectable="true"
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <!-- 用户名输入框和登录按钮 -->
@@ -98,6 +100,8 @@
                         android:padding="8dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/green_moderate"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -112,6 +116,7 @@
                     android:textColor="@color/green_heavy"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@+id/ll_et_password"
+                    android:textIsSelectable="true"
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <!-- 密码输入框和登录按钮 -->
@@ -143,6 +148,8 @@
                         android:padding="8dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/green_moderate"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
                         android:textSize="14sp" />
 
                     <TextView
@@ -156,6 +163,7 @@
                         android:paddingEnd="@dimen/space20"
                         android:text="找回密码"
                         android:textColor="@android:color/white"
+                        android:textIsSelectable="true"
                         android:textSize="16dp" />
                 </LinearLayout>
 
@@ -212,6 +220,7 @@
                     android:textColor="@color/green_heavy"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:textIsSelectable="true"
                     app:layout_constraintStart_toStartOf="parent" />
 
 
