@@ -18,6 +18,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.mamh.smartwardrobe.R
@@ -25,6 +26,7 @@ import com.mamh.smartwardrobe.bean.flag.MessageType
 import com.mamh.smartwardrobe.bean.flag.TestFlag
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
 import com.mamh.smartwardrobe.databinding.ActivityMainBinding
+import com.mamh.smartwardrobe.databinding.DialogAddClothBinding
 import com.mamh.smartwardrobe.util.itembuild.DataItemBuilder
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var addClothBinding: DialogAddClothBinding
     private val viewModel: MainActivityViewModel by viewModels()
 
     private val REQUEST_ACCESS_NETWORK_STATE = 0
@@ -188,11 +191,22 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    //点击衣物符号，根据天气推荐衣物
+    //点击fab符号添加衣物
     @OptIn(DelicateCoroutinesApi::class)
     private fun showAddClothView() {
+        this.let {
+            //对话框视图绑定
+            addClothBinding = DialogAddClothBinding.inflate(layoutInflater)
 
+            val addClothHandler = AddClothHandler(addClothBinding, viewModel)
+
+            //构建对话框
+            MaterialAlertDialogBuilder(it)
+                .setView(addClothBinding.root)
+                .show()
+        }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

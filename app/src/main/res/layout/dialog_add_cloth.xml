@@ -1,0 +1,114 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 衣物名称 -->
+        <TextView
+            android:id="@+id/tv_add_cloth_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="衣物名称："
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_add_cloth_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_add_cloth_name"
+            android:hint="请输入衣物名称"
+            android:inputType="text" />
+
+        <!-- 衣物颜色 -->
+        <TextView
+            android:id="@+id/tv_cloth_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_add_cloth_name"
+            android:layout_marginTop="16dp"
+            android:text="衣物颜色："
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/spinner_colors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_cloth_color"
+            android:layout_marginTop="8dp" />
+
+        <!-- 衣物款式 -->
+        <TextView
+            android:id="@+id/tv_cloth_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/spinner_colors"
+            android:layout_marginTop="16dp"
+            android:text="衣物款式："
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_cloth_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_cloth_style"
+            android:hint="请输入衣物款式"
+            android:inputType="text" />
+
+        <!-- 衣物材质 -->
+        <TextView
+            android:id="@+id/textViewMaterial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_cloth_style"
+            android:layout_marginTop="16dp"
+            android:text="衣物材质："
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_material"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewMaterial"
+            android:hint="请输入衣物材质"
+            android:inputType="text" />
+
+        <!-- 衣物尺寸 -->
+        <TextView
+            android:id="@+id/tv_cloth_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_material"
+            android:layout_marginTop="16dp"
+            android:text="衣物尺寸："
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_cloth_size"
+            android:hint="请输入衣物尺寸"
+            android:inputType="text" />
+
+        <!-- 添加按钮 -->
+        <Button
+            android:id="@+id/btn_add_cloth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_text_size"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/background_green"
+            android:fontFamily="serif"
+            android:text="添加衣物"
+            android:textColor="@color/green_heavy" />
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

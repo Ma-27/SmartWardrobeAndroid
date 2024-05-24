@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mamh.smartwardrobe.bean.flag.MessageType
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
+import com.mamh.smartwardrobe.bean.item.ClothItem
 import com.mamh.smartwardrobe.bean.item.DataItem
 import com.mamh.smartwardrobe.data.AppRepository
 import com.mamh.smartwardrobe.data.serialize.DatagramParser
@@ -22,6 +23,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             .build()
     var repository: AppRepository = _repository
 
+
+    /// ------------------------- 互联网-物联网数据传输控制部分------------------------------------------------------------------------------------------------------------
 
     //数据接收缓存
     private val _dataReceiveCache = _repository.dataReceiveCache
@@ -43,6 +46,16 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     //发送和接受数据的列表
     private val _dataList = repository.dataList
     var dataList: LiveData<MutableList<DataItem>> = _dataList
+
+
+    /// ------------------------- 衣物数据部分------------------------------------------------------------------------------------------------------------
+
+    // 衣物列表
+    private val _clothList = _repository.clothList
+    var clothList: LiveData<List<ClothItem>> = _clothList
+
+
+    /// ------------------------- 互联网-物联网数据传输控制部分------------------------------------------------------------------------------------------------------------
 
 
     //发送数据到已连接的主机。注意：该方法为网络方法，要在网络进程中处理
@@ -110,5 +123,13 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         dataItem.event = DataItemBuilder.determineEventString(data, MessageType.MESSAGE_SEND)
         //存入发送数据列表中，发送数据
         repository.addDataItemToList(dataItem)
+    }
+
+
+    /// ------------------------- 衣物数据部分------------------------------------------------------------------------------------------------------------
+
+    // 添加衣物数据的方法
+    fun addCloth(item: ClothItem) {
+        repository.addCloth(item)
     }
 }

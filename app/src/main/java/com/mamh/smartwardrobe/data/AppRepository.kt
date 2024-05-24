@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mamh.smartwardrobe.bean.flag.TestFlag
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
+import com.mamh.smartwardrobe.bean.item.ClothItem
 import com.mamh.smartwardrobe.bean.item.DataItem
 import com.mamh.smartwardrobe.bean.item.WifiItem
 import com.mamh.smartwardrobe.bean.netpacket.DailyWeatherResponse
@@ -191,6 +192,15 @@ class AppRepository private constructor(
     }
     val lightControlAuto: LiveData<Boolean>
         get() = _lightControlAuto
+
+
+    /// ------------------------- 衣物数据部分--------------------------------------------------------------------
+
+    // 衣物列表
+    private val _clothList = MutableLiveData<List<ClothItem>>().apply {
+        value = emptyList<ClothItem>()
+    }
+    var clothList: LiveData<List<ClothItem>> = _clothList
 
 
     /**
@@ -405,4 +415,15 @@ class AppRepository private constructor(
     fun updateKnobValue(knobValue: Int) {
         _currentKnobValue.value = knobValue
     }
+
+    /// ------------------------- 衣物数据部分-----------------------------------------------------------------------------
+
+
+    // 添加衣物数据的方法
+    fun addCloth(item: ClothItem) {
+        val currentList = _clothList.value?.toMutableList() ?: mutableListOf()
+        currentList.add(item)
+        _clothList.value = currentList.toList()
+    }
+
 }
