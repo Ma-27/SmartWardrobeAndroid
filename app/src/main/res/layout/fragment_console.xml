@@ -15,13 +15,16 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/ns_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:focusableInTouchMode="true">
 
             <!--总体约束布局-->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -56,13 +59,12 @@
 
                         <TextView
                             android:id="@+id/tv_humidity_hint"
-                            android:layout_width="wrap_content"
+                            android:layout_width="180dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="24dp"
-                            android:layout_marginTop="@dimen/h3"
+                            android:layout_marginTop="14dp"
                             android:padding="4dp"
-                            android:text="空气湿度：较为湿润"
-                            android:textAlignment="center"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.comfortDescription}"
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
@@ -76,14 +78,13 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:padding="4dp"
-                            android:text="24"
+                            android:layout_marginStart="36dp"
                             android:fontFamily="sans-serif"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="36sp"
                             app:layout_constraintBaseline_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="@+id/tv_humidity_hint"
-                            app:layout_constraintHorizontal_bias="0.488"
+                            android:text="@{String.valueOf(viewmodel.usefulDailyWeatherDetail.pm25)}"
                             app:layout_constraintStart_toStartOf="@+id/tv_humidity_hint"
                             android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_humidity_hint" />
@@ -95,7 +96,7 @@
                             android:layout_marginTop="8dp"
                             android:fontFamily="sans-serif"
                             android:padding="4dp"
-                            android:text="23°C 晴朗"
+                            android:text='@{String.valueOf(viewmodel.usefulDailyWeatherDetail.temperature) + "°C " + viewmodel.usefulDailyWeatherDetail.weatherCondition}'
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="32sp"
@@ -107,10 +108,10 @@
                             android:id="@+id/textView4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="14dp"
                             android:layout_marginEnd="24dp"
                             android:padding="4dp"
-                            android:text="重庆市 渝北区"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.location}"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
@@ -126,7 +127,7 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="16dp"
                             android:fontFamily="serif"
-                            android:text="建议穿清爽衬衫，轻薄裤，舒适帆布鞋。"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.dressingAdvice}"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
@@ -290,7 +291,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="设定温度"
+                            android:text="目标温度"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
@@ -307,7 +308,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="@{String.format(@string/temperature_with_unit_int, viewmodel.pendingTemperature)}"
+                            android:text="@{String.format(@string/temperature_with_unit_int, viewmodel.targetTemperature)}"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
@@ -451,7 +452,7 @@
                             android:layout_marginTop="3dp"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="设定湿度"
+                            android:text="目标湿度"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
@@ -460,21 +461,25 @@
                             android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_humidity_value" />
 
-                        <TextView
-                            android:id="@+id/tv_humidity_setting"
+                        <EditText
+                            android:id="@+id/et_humidity_setting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:fontFamily="serif"
-                            android:padding="2dp"
-                            android:text="36%"
+                            android:layout_margin="2dp"
+                            android:backgroundTint="@color/white"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:inputType="number"
                             app:layout_constraintEnd_toEndOf="@+id/tv_undefined7"
                             app:layout_constraintStart_toStartOf="@+id/tv_undefined7"
                             android:textIsSelectable="true"
+                            android:maxLength="3"
+                            android:text='@{String.valueOf(viewmodel.targetHumidity) + "%" }'
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined7" />
+
 
 
                         <Switch
@@ -488,7 +493,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/tv_humidity_value"
                             app:layout_constraintStart_toStartOf="@+id/tv_humidity_value"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_humidity_setting"
+                            app:layout_constraintTop_toBottomOf="@+id/et_humidity_setting"
                             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 

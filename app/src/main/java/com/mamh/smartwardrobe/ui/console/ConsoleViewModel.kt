@@ -6,9 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mamh.smartwardrobe.bean.flag.MessageType
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
+import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
 import com.mamh.smartwardrobe.data.AppRepository
 import com.mamh.smartwardrobe.util.itembuild.DataItemBuilder
-import timber.log.Timber
 
 class ConsoleViewModel(application: Application) : AndroidViewModel(application) {
     private val _repository: AppRepository =
@@ -23,49 +23,19 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
     val latlng: LiveData<String>
         get() = _latlng
 
-    // 空气湿度，默认值为
-    private val _airHumidity = MutableLiveData<Int>(0)
-    val airHumidity: LiveData<Int>
-        get() = _airHumidity
-
-    // PM指数，默认值为0
-    private val _pmIndex = MutableLiveData<Int>(0)
-    val pmIndex: LiveData<Int>
-        get() = _pmIndex
-
-    // 温度，默认值为18°C
-    private val _weatherForecastTemperature = MutableLiveData<Int>(18)
-    val weatherForecastTemperature: LiveData<Int>
-        get() = _weatherForecastTemperature
-
-    // 位置，默认值为"Unknown location"
-    private val _location = MutableLiveData<String>("Unknown location")
-    val location: LiveData<String>
-        get() = _location
-
-    // 天气状况，默认值为"Sunny"
-    private val _weatherCondition = MutableLiveData<String>("Sunny")
-    val weatherCondition: LiveData<String>
-        get() = _weatherCondition
-
-    // 穿衣建议，默认值为"Standard attire"
-    private val _clothingSuggestion = MutableLiveData<String>("Standard attire")
-    val clothingSuggestion: LiveData<String>
-        get() = _clothingSuggestion
+    // 天气信息
+    private val _usefulDailyWeatherDetail = _repository.usefulDailyWeatherDetail
+    val usefulDailyWeatherDetail: LiveData<UsefulDailyWeatherDetail>
+        get() = _usefulDailyWeatherDetail
 
 
     /// ---------------------------- 传感器数据部分 --------------------------------------------------------
     // 缓存温度调节的目标温度
-    private val _targetTemperature = _repository.targetTemperature
-    val targetTemperature: LiveData<Int>
-        get() = _targetTemperature
-
-    // 滑动时可见的目标温度，当结束滑动时，设置为目标温度
-    private val _pendingTemperature = MutableLiveData<Int>().apply {
+    private val _targetTemperature = MutableLiveData<Int>().apply {
         value = 15
     }
-    val pendingTemperature: LiveData<Int>
-        get() = _pendingTemperature
+    val targetTemperature: LiveData<Int>
+        get() = _targetTemperature
 
 
     //缓存温度调节的当前温度
@@ -77,6 +47,13 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
     private val _currentHumidity = _repository.currentHumidity
     val currentHumidity: LiveData<Int>
         get() = _currentHumidity
+
+    // 缓存温度调节的目标湿度
+    private val _targetHumidity = MutableLiveData<Int>().apply {
+        value = 21
+    }
+    val targetHumidity: LiveData<Int>
+        get() = _targetHumidity
 
     //缓存灯光是否开启
     private val _lightOn = _repository.lightOn
@@ -99,41 +76,26 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
 
     /// ---------------------------- setter部分 --------------------------------------------------------
 
-    // 设置目标温度
-    fun setTargetTemperature() {
-        Timber.d("设置目标温度为${pendingTemperature.value}")
-        pendingTemperature.value?.let { _repository.setTargetTemperature(it) }
-    }
 
     // 设置目标温度
-    fun setPendingTemperature(temperature: Int) {
-        _pendingTemperature.value = temperature
+    fun setTargetTemperature(temperature: Int) {
+        _targetTemperature.value = temperature
+    }
+
+    // 设置目标湿度
+    fun setTargetHumidity(humidity: Int) {
+        _targetHumidity.value = humidity
     }
 
     // Setter 方法，允许外部更新LiveData的值
-    fun setHumidity(value: Int) {
-        _airHumidity.value = value
+
+
+    // 设置穿衣建议
+    fun setWeatherDetail(value: UsefulDailyWeatherDetail) {
+        repository.setUsefulDailyWeatherDetail(value)
     }
 
-    fun setPmIndex(value: Int) {
-        _pmIndex.value = value
-    }
 
-    fun setTemperature(value: Int) {
-        _weatherForecastTemperature.value = value
-    }
-
-    fun setLocation(value: String) {
-        _location.value = value
-    }
-
-    fun setWeatherCondition(value: String) {
-        _weatherCondition.value = value
-    }
-
-    fun setClothingSuggestion(value: String) {
-        _clothingSuggestion.value = value
-    }
 
 
     /// ---------------------------- 处理逻辑 --------------------------------------------------------

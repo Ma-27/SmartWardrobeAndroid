@@ -13,10 +13,12 @@ import org.json.JSONObject
 class CommandDatagram private constructor(
     private val deviceId: Int,
     private val from: Int,
+    private val target: Int? = null,
     private val packetType: String,
     private val command: String,
+    private val actuator: String? = null, // 改为可空类型
     private val action: String,
-    private val remark: String
+    private val remark: String,
 ) {
     class Builder {
         private var deviceId: Int = 1
@@ -25,6 +27,19 @@ class CommandDatagram private constructor(
         private var command: String = "Default"
         private var action: String = "default"
         private var remark: String = "default remark"
+
+        private var target: Int? = null // Making target nullable in the builder
+        private var actuator: String? = null
+
+        fun setTarget(target: Int?): Builder { // Allow setting target as nullable
+            this.target = target
+            return this
+        }
+
+        fun setActuator(actuator: String?): Builder {
+            this.actuator = actuator
+            return this
+        }
 
         fun setDeviceId(deviceId: Int): Builder {
             this.deviceId = deviceId
@@ -57,7 +72,16 @@ class CommandDatagram private constructor(
         }
 
         fun build(): CommandDatagram {
-            return CommandDatagram(deviceId, from, packetType, command, action, remark)
+            return CommandDatagram(
+                deviceId,
+                from,
+                target,
+                packetType,
+                command,
+                actuator ?: "",
+                action,
+                remark
+            )
         }
     }
 
@@ -69,6 +93,10 @@ class CommandDatagram private constructor(
         jsonObject.put("command", command)
         jsonObject.put("action", action)
         jsonObject.put("remark", remark)
+        // 添加target字段，只要非 null
+        target?.let { jsonObject.put("target", it) }
+        // 添加actuator字段，只要非 null
+        actuator?.let { jsonObject.put("actuator", it) }
         return jsonObject.toString()
     }
 }

@@ -8,12 +8,14 @@ package com.mamh.smartwardrobe.bean.netpacket
  **/
 
 data class UsefulDailyWeatherDetail(
-    val location: String,         // 地理位置，格式为"Lat: 纬度, Lon: 经度"
-    val temperature: Int,         // 温度信息，平均温度
-    val humidity: Int,            // 湿度信息，平均湿度
-    val pm25: Int,                // PM2.5信息，包含最高、最低和平均值
-    val dressingIndex: Int,       // 穿衣指数，包含指数和描述
-    val dressingAdvice: String,   // 穿衣建议
-    val weatherCondition: String  // 天气状况，如“晴朗”或“阴天”
+    var location: String = "重庆市 渝北区",         // 地理位置，格式为"Lat: 纬度, Lon: 经度"
+    var temperature: Int = 23,         // 温度信息，平均温度
+    var humidity: Int = 40,            // 湿度信息，平均湿度
+    var pm25: Int = 24,                // PM2.5信息，包含最高、最低和平均值
+    var dressingIndex: Int = 2,       // 穿衣指数，包含指数和描述
+    var dressingAdvice: String = "建议穿清爽衬衫，轻薄裤，舒适帆布鞋",   // 穿衣建议
+    var weatherCondition: String = "晴朗",  // 天气状况，如“晴朗”或“阴天”
+    var comfortIndex: Int = 6,       // 舒适度指数
+    var comfortDescription: String = "未知的舒适度指数",  // 舒适度描述
 )
 

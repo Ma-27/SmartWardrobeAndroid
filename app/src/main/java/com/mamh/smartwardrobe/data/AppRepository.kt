@@ -13,6 +13,7 @@ import com.mamh.smartwardrobe.network.Connection
 import com.mamh.smartwardrobe.network.NetWorkServiceFactory
 import com.mamh.smartwardrobe.network.Transmission
 import com.mamh.smartwardrobe.network.internet.CaiyunWeatherApi
+import com.mamh.smartwardrobe.util.itembuild.WeatherTransferObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -124,6 +125,15 @@ class AppRepository private constructor(
         get() = _latlng
 
 
+    // 缓存天气数据
+    private val _usefulDailyWeatherDetail = MutableLiveData<UsefulDailyWeatherDetail>().apply {
+        //默认值为TestFlag.SEND
+        value = UsefulDailyWeatherDetail()
+    }
+    val usefulDailyWeatherDetail: LiveData<UsefulDailyWeatherDetail>
+        get() = _usefulDailyWeatherDetail
+
+
     /// ------------------------- 传感器数据部分--------------------------------------------------------------------
 
 
@@ -133,14 +143,6 @@ class AppRepository private constructor(
     }
     val currentTemperature: LiveData<Float>
         get() = _currentTemperature
-
-
-    //缓存温度调节的目标温度
-    private val _targetTemperature = MutableLiveData<Int>().apply {
-        value = 15
-    }
-    val targetTemperature: LiveData<Int>
-        get() = _targetTemperature
 
 
     // 存储当前亮度的数据
@@ -275,8 +277,8 @@ class AppRepository private constructor(
             //报告发送状态
             setUserHint(
                 when (status) {
-                    TransmissionStatus.SUCCESS -> "数据发送成功"
-                    TransmissionStatus.FAIL -> "数据发送失败"
+                    TransmissionStatus.SUCCESS -> "命令发送成功"
+                    TransmissionStatus.FAIL -> "命令发送失败"
                     TransmissionStatus.SOCKET_NULL -> "端口为空"
                     TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
                     TransmissionStatus.DEVICE_NOT_ONLINE -> "设备不在线，请检查设备的电源或网络"
@@ -298,8 +300,6 @@ class AppRepository private constructor(
         _latlng.postValue(value)
     }
 
-
-    /// ------------------------其他网络API和服务部分----------------------------------------
 
     // 向服务器请求天气数据
     suspend fun updateWeatherFromRemote(): UsefulDailyWeatherDetail? {
@@ -335,48 +335,52 @@ class AppRepository private constructor(
         val location = "Lat: ${response.location[0]}, Lon: ${response.location[1]}"
 
         val temperature = response.result.daily.temperature.firstOrNull()
-        val temperatureMax = temperature?.max?.toInt() ?: 0
-        val temperatureMin = temperature?.min?.toInt() ?: 0
         val temperatureAvg = temperature?.avg?.toInt() ?: 0
 
         val humidity = response.result.daily.humidity.firstOrNull()
-        val humidityMax = (humidity?.max ?: 0).toInt()
-        val humidityMin = (humidity?.min ?: 0).toInt()
         val humidityAvg = (humidity?.avg ?: 0).toInt()
 
         val pm25 = response.result.daily.air_quality.pm25.firstOrNull()
-        val pm25Max = pm25?.max ?: 0
-        val pm25Min = pm25?.min ?: 0
         val pm25Avg = (pm25?.avg ?: 0).toInt()
 
         val dressing = response.result.daily.life_index.dressing.firstOrNull()
         val dressingIndex = dressing?.index?.toInt() ?: 0
         val dressingAdvice = dressing?.desc ?: ""
 
+        val comfort = response.result.daily.life_index.comfort.firstOrNull()
+        val comfortIndex = comfort?.index?.toInt() ?: 0
+        val comfortDescription = comfort?.desc ?: ""
+
         val skycon = response.result.daily.skycon.firstOrNull()
-        val weatherCondition = skycon?.value ?: "Not available"
+        val weatherCondition = skycon?.value ?: "CLEAR"
 
         return UsefulDailyWeatherDetail(
-            location = location,
+            location = "重庆市 渝北区",// location,
             temperature = temperatureAvg,
             humidity = humidityAvg,
             pm25 = pm25Avg,
             dressingIndex = dressingIndex,
-            dressingAdvice = dressingAdvice,
-            weatherCondition = weatherCondition
+            // 穿衣指数提示字符串
+            dressingAdvice = WeatherTransferObject.convertToDressingAdvice(dressingIndex),
+            comfortIndex = comfortIndex,
+            // 舒适指数提示字符串
+            comfortDescription = WeatherTransferObject.convertToComfortDescription(comfortIndex),
+            // 天气现象提示字符串(晴朗等）
+            weatherCondition = WeatherTransferObject.convertToPhenomenon(weatherCondition)
         )
+    }
+
+
+    // 更新天气数据
+    fun setUsefulDailyWeatherDetail(value: UsefulDailyWeatherDetail) {
+        _usefulDailyWeatherDetail.value = value
     }
 
 
     /// ------------------------- 传感器数据部分-----------------------------------------------------------------------------
 
 
-    // 设置目标温度
-    fun setTargetTemperature(temperature: Int) {
-        _targetTemperature.value = temperature
-    }
-
-
+    // 设置用户提示
     fun setUserHint(value: String) {
         _userHint.postValue(value)
     }

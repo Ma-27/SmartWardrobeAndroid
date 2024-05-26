@@ -119,11 +119,8 @@ class ClothModelTest {
             )
         )
 
-        // 创建 ClothModel 实例
-        val clothModel = ClothModel()
-
         // 调用 recommend 函数
-        val recommendedClothes = clothModel.recommend(weatherDetail, clothes)
+        val recommendedClothes = ClothModel.recommend(weatherDetail, clothes)
 
         // 打印推荐结果
         logger.info("推荐结果:")

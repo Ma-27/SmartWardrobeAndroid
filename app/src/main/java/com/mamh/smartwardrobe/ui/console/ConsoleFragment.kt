@@ -10,10 +10,13 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.SeekBar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -69,6 +72,9 @@ class ConsoleFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     @OptIn(DelicateCoroutinesApi::class)
     private fun setListener() {
+
+        /// ---------------------------------根视图与数据处理------------------------------------------------------
+
         // 设置SwipeRefreshLayout的下拉刷新监听
         binding.swipeRefreshLayout.setOnRefreshListener {
             //下拉刷新时，重新获取传感器数据
@@ -150,17 +156,285 @@ class ConsoleFragment : Fragment() {
         }
 
 
-        //温度控制系统打开按钮监听
-        binding.switchTemperature.setOnCheckedChangeListener { compoundButton, b ->
-            // true则打开，打开后从这里处理
-            if (b) {
-                //打开后从这里处理
-                Timber.d("温度控制系统已开启")
+        // 处理视图派遣冲突
+        binding.sbTemperature.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 当用户开始触摸 `SeekBar` 时，请求不拦截触摸事件
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                }
 
-            } else {
-                Timber.d("温度控制系统已关闭")
+                MotionEvent.ACTION_UP -> {
+                    // 当用户停止触摸 `SeekBar` 时，允许拦截触摸事件
+                    v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            // false 让 `SeekBar` 的原生触摸功能正常处理
+            false
+        }
+
+        // 观察经纬度信息，如果经纬度变了，才刷新
+        consoleViewModel.repository.latlng.observe(viewLifecycleOwner, object : Observer<String> {
+            private var lastObservedLatLng = ""
+            override fun onChanged(newLatLng: String) {
+                // 检查新的经纬度是否与上一次观察到的不同
+                if (newLatLng != lastObservedLatLng) {
+                    // 更新最后观察到的经纬度
+                    lastObservedLatLng = newLatLng
+
+                    // 经纬度有变化，从云端API更新天气数据
+                    lifecycleScope.launch {
+                        // 从远程API更新天气数据
+                        val weather = consoleViewModel.repository.updateWeatherFromRemote()
+                            ?.let { weatherDetail ->
+                                Timber.d("Weather data updated from remote API: $weatherDetail")
+                                // 将其存储
+                                consoleViewModel.setWeatherDetail(weatherDetail)
+                                // 记录更新结果
+                                Timber.d("Weather data by transformation to live data: $weatherDetail")
+                                weatherDetail // 返回非空的 UsefulDailyWeatherDetail 对象
+                        }
+                        // 更新结束
+                    }
+                }
+            }
+        })
+
+
+        /// ---------------------------- 监控温度部分 --------------------------------------------------------
+
+        // 自动温度控制打开按钮监听
+        binding.switchTemperature.setOnCheckedChangeListener { compoundButton, b ->
+            // 禁用 Switch 防止用户在执行过程中改变其状态
+            compoundButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "enable" else "disable"
+            val remark =
+                if (b) "Command to enable the auto control target temperature" else "Command to disable the auto control target temperature"
+
+            // 构建命令数据报
+            val temperatureCommand = CommandDatagram.Builder()
+                .setCommand("Temperature-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setTarget(consoleViewModel.targetTemperature.value!!)
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = temperatureCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 启用 Switch
+            compoundButton.isEnabled = true
+
+            Timber.d("Datagram send to auto control temperature:$temperatureCommand")
+        }
+
+
+        // 增温控制
+        binding.segmentedButtonTemperatureHeat.addOnCheckedChangeListener { materialButton, b ->
+            // 禁用 按钮 防止用户在执行过程中改变其状态
+            materialButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "turn_on" else "turn_off"
+            val remark =
+                if (b) "Command to turn on the heater." else "Command to turn off the heater."
+
+            // 构建命令数据报
+            val heaterCommand = CommandDatagram.Builder()
+                .setCommand("Actuator-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setActuator("Heater")
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = heaterCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 重新启用 按钮
+            materialButton.isEnabled = true
+
+            Timber.d("Datagram send to turn on/off heater:$heaterCommand")
+        }
+
+
+        // 降温控制
+        binding.segmentedButtonTemperatureCool.addOnCheckedChangeListener { materialButton, b ->
+            // 禁用 按钮 防止用户在执行过程中改变其状态
+            materialButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "turn_on" else "turn_off"
+            val remark =
+                if (b) "Command to turn on the cooler." else "Command to turn off the cooler."
+
+            // 构建命令数据报
+            val coolerCommand = CommandDatagram.Builder()
+                .setCommand("Actuator-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setActuator("Cooler")
+                .setTarget(255)
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = coolerCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 重新启用 按钮
+            materialButton.isEnabled = true
+
+            Timber.d("Datagram send to turn on/off cooler:$coolerCommand")
+        }
+
+
+        // 设置温度滑动条的监听器
+        binding.sbTemperature.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            var temperature: Int = 15
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // Called when the progress value is changed
+                temperature = 15 + (progress * 15) / 100
+
+                consoleViewModel.setTargetTemperature(temperature)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                // Called when the user starts touching the seekbar
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                // Called when the user stops touching the seekbar
+            }
+        })
+
+
+        /// ---------------------------- 控制湿度部分 --------------------------------------------------------
+
+        // 自动湿度控制打开按钮监听
+        binding.switchHumidity.setOnCheckedChangeListener { compoundButton, b ->
+            // 禁用 Switch 防止用户在执行过程中改变其状态
+            compoundButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "enable" else "disable"
+            val remark =
+                if (b) "Command to enable the auto control target humidity" else "Command to disable the auto control target humidity"
+
+            // 构建命令数据报
+            val humidityCommand = CommandDatagram.Builder()
+                .setCommand("Humidity-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setTarget(consoleViewModel.targetHumidity.value!!)
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = humidityCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 启用 Switch
+            compoundButton.isEnabled = true
+
+            Timber.d("Datagram send to auto control humidity:$humidityCommand")
+        }
+
+
+        // 设置湿度输入框的监听器,检测输入湿度
+        binding.etHumiditySetting.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                // This method is called before the text is changed
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                // This method is called when the text is changing
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                // This method is called after the text has changed
+
+                // Convert text to integer and update data
+                val newHumidityText = editable.toString()
+                val trimmedText = newHumidityText.replace("%", "").trim()
+                if (trimmedText.isNotEmpty()) {
+                    val newHumidity = Integer.parseInt(trimmedText)
+                    consoleViewModel.setTargetHumidity(newHumidity)
+                }
+
+            }
+        })
+        binding.etHumiditySetting.setOnFocusChangeListener { view, b ->
+            if (!b) {
+                // 当EditText失去焦点时，隐藏键盘
+                val imm =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.etHumiditySetting.windowToken, 0)
             }
         }
+
+
+        // 加湿控制
+        binding.segmentedButtonHumidityIncrease.addOnCheckedChangeListener { materialButton, b ->
+            // 禁用 按钮 防止用户在执行过程中改变其状态
+            materialButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "turn_on" else "turn_off"
+            val remark =
+                if (b) "Command to turn on the humidifier." else "Command to turn off the humidifier."
+
+            // 构建命令数据报
+            val humidifierCommand = CommandDatagram.Builder()
+                .setCommand("Actuator-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setActuator("Humidifier")
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = humidifierCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 重新启用 按钮
+            materialButton.isEnabled = true
+
+            Timber.d("Datagram send to turn on/off humidifier:$humidifierCommand")
+        }
+
+
+        // 除湿控制
+        binding.segmentedButtonHumidityDecrease.addOnCheckedChangeListener { materialButton, b ->
+            // 禁用 按钮 防止用户在执行过程中改变其状态
+            materialButton.isEnabled = false
+
+            // 根据布尔值b决定操作和备注信息
+            val action = if (b) "turn_on" else "turn_off"
+            val remark =
+                if (b) "Command to turn on the dehumidifier." else "Command to turn off the dehumidifier."
+
+            // 构建命令数据报
+            val dehumidifierCommand = CommandDatagram.Builder()
+                .setCommand("Actuator-Control")
+                .setAction(action)
+                .setRemark(remark)
+                .setTarget(255)
+                .setActuator("Dehumidifier")
+                .build()
+
+            // 转换为JSON字符串并发送
+            val datagram = dehumidifierCommand.toJsonString()
+            consoleViewModel.sendData(datagram)
+
+            // 重新启用 按钮
+            materialButton.isEnabled = true
+
+            Timber.d("Datagram send to turn on/off dehumidifier:$dehumidifierCommand")
+        }
+
+
+        /// ---------------------------- 控制灯光部分 --------------------------------------------------------
 
         // 灯光控制系统打开按钮监听
         binding.switchLight.setOnCheckedChangeListener { compoundButton, b ->
@@ -184,7 +458,10 @@ class ConsoleFragment : Fragment() {
 
             // 启用 Switch
             compoundButton.isEnabled = true
+
+            Timber.d("Datagram send to switch on/off light:$lightCommand")
         }
+
 
         // 灯光控制系统自动控制按钮监听
         binding.switchLightAuto.setOnCheckedChangeListener { compoundButton, b ->
@@ -210,96 +487,9 @@ class ConsoleFragment : Fragment() {
 
             // 启用 Switch
             compoundButton.isEnabled = true
+
+            Timber.d("Datagram send to auto control light:$lightControlCommand")
         }
-
-
-        // 处理视图派遣冲突
-        binding.sbTemperature.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // 当用户开始触摸 `SeekBar` 时，请求不拦截触摸事件
-                    v.parent.requestDisallowInterceptTouchEvent(true)
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    // 当用户停止触摸 `SeekBar` 时，允许拦截触摸事件
-                    v.parent.requestDisallowInterceptTouchEvent(false)
-                }
-            }
-            // false 让 `SeekBar` 的原生触摸功能正常处理
-            false
-        }
-
-
-        //
-        binding.sbTemperature.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            var temperature: Int = 15
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                // Called when the progress value is changed
-                temperature = 15 + (progress * 15) / 100
-
-                consoleViewModel.setPendingTemperature(temperature)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                // Called when the user starts touching the seekbar
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-                // Called when the user stops touching the seekbar
-
-                /*
-                //向主机发送温度数据,只保留温度到整数
-                consoleViewModel.targetTemperature.value?.toString()
-                    ?.let {
-                        consoleViewModel.setTargetTemperature()
-                    }
-                 */
-            }
-        })
-
-        // 网络状态变了，再发送新报文
-        consoleViewModel.repository.userHint.observe(this, Observer {
-            consoleViewModel.repository.userHint.value?.let { it ->
-
-            }
-        })
-
-        // 观察经纬度信息，如果经纬度变了，才刷新
-        consoleViewModel.repository.latlng.observe(viewLifecycleOwner, object : Observer<String> {
-            private var lastObservedLatLng = ""
-            override fun onChanged(newLatLng: String) {
-                // 检查新的经纬度是否与上一次观察到的不同
-                if (newLatLng != lastObservedLatLng) {
-                    // 更新最后观察到的经纬度
-                    lastObservedLatLng = newLatLng
-
-                    // 经纬度有变化，从云端API更新天气数据
-
-
-                    lifecycleScope.launch {
-                        /*
-                        consoleViewModel.repository.updateWeatherFromRemote()?.let {
-                            // 通过函数更新每个LiveData的值
-
-                            consoleViewModel.setHumidity(it.humidity)
-                            consoleViewModel.setPmIndex(it.pm25)
-                            consoleViewModel.setTemperature(it.temperature)  // 假设温度后有°C，去除它并转换为整数
-                            consoleViewModel.setLocation(it.location)
-                            consoleViewModel.setWeatherCondition(it.weatherCondition)
-                            consoleViewModel.setClothingSuggestion(it.dressingAdvice)
-
-
-                        }
-
-                         */
-                    }
-
-
-                    // fixme
-                }
-            }
-        })
 
 
     }

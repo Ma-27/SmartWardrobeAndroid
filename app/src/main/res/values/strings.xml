@@ -32,5 +32,7 @@
     <string name="humidity_with_unit">%1$d%%</string>
     <string name="brightness_with_unit">%1$d lux</string>
     <string name="knob_value_with_unit">%1$d%%</string>
+    <string name="humidity_with_unit_int">%d%%</string>
+    <string name="brightness_with_unit_int">%d lux</string>
 
 </resources>

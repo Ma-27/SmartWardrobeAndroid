@@ -36,7 +36,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:paddingStart="16dp"
-            android:text="标题"
+            android:text="@{clothitem.name}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"

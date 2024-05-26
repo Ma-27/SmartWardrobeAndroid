@@ -45,7 +45,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_cloth_color"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:entries="@array/cloth_colors" />
 
         <!-- 衣物款式 -->
         <TextView

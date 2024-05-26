@@ -9,7 +9,7 @@ import java.util.Locale
 /**
  * @description 衣物推荐模型类，根据天气、温湿度、历史穿着记录等因素计算推荐指数，推荐合适的衣物
  */
-class ClothModel {
+object ClothModel {
 
     // 定义权重
     private var dressingIndexWeight = 0.4
@@ -35,32 +35,37 @@ class ClothModel {
         weatherDetail: UsefulDailyWeatherDetail,
         clothes: List<ClothItem>
     ): List<ClothItem> {
-        val recommendedClothes = mutableListOf<ClothItem>()
+        return clothes.filter { it.isInCloset && it.isClean }
+            .map { cloth -> calculateRecommendationScore(weatherDetail, cloth) }
+            .sortedByDescending { it.recommendationScore }
+            .take(5)
+    }
 
-        for (cloth in clothes) {
-            // 忽略不在衣柜或不干净的衣物
-            if (!cloth.isInCloset || !cloth.isClean) continue
+    // 推荐函数，根据天气信息和单个衣物，计算推荐指数并返回衣物评分
+    fun recommend(
+        weatherDetail: UsefulDailyWeatherDetail,
+        cloth: ClothItem
+    ): Double {
+        return calculateRecommendationScore(weatherDetail, cloth).recommendationScore
+    }
 
-            // 计算各项评分
-            val dressingScore = dressingIndexScores[weatherDetail.dressingIndex] ?: 0.0
-            val temperatureScore = calculateTemperatureScore(weatherDetail.temperature, cloth)
-            val humidityScore = calculateHumidityScore(weatherDetail.humidity, cloth)
-            val wearHistoryScore = calculateWearHistoryScore(cloth.lastWornDate)
+    // 计算推荐指数
+    private fun calculateRecommendationScore(
+        weatherDetail: UsefulDailyWeatherDetail,
+        cloth: ClothItem
+    ): ClothItem {
+        val dressingScore = dressingIndexScores[weatherDetail.dressingIndex] ?: 0.0
+        val temperatureScore = calculateTemperatureScore(weatherDetail.temperature, cloth)
+        val humidityScore = calculateHumidityScore(weatherDetail.humidity, cloth)
+        val wearHistoryScore = calculateWearHistoryScore(cloth.lastWornDate)
 
-            // 综合评分（使用非线性函数进行处理）
-            val totalScore = sigmoid(dressingScore * dressingIndexWeight) +
-                    sigmoid(temperatureScore * temperatureWeight) +
-                    sigmoid(humidityScore * humidityWeight) +
-                    sigmoid(wearHistoryScore * wearHistoryWeight)
+        val totalScore = sigmoid(dressingScore * dressingIndexWeight) +
+                sigmoid(temperatureScore * temperatureWeight) +
+                sigmoid(humidityScore * humidityWeight) +
+                sigmoid(wearHistoryScore * wearHistoryWeight)
 
-            // 给衣物添加综合评分
-            cloth.recommendationScore = totalScore
-            recommendedClothes.add(cloth)
-        }
-
-        // 按照综合评分降序排序
-        recommendedClothes.sortByDescending { it.recommendationScore }
-        return recommendedClothes.take(5) // 推荐前5件
+        cloth.recommendationScore = totalScore
+        return cloth
     }
 
     // 计算温度适应性得分，根据衣物材质和设计
@@ -90,34 +95,6 @@ class ClothModel {
         val lastWornDaysAgo =
             (System.currentTimeMillis() - lastWornDate.toDate().time) / (1000 * 60 * 60 * 24)
         return if (lastWornDaysAgo > 30) 1.0 else 0.5
-    }
-
-    // 根据用户反馈调整权重
-    fun updateWeightsBasedOnFeedback(feedback: Int) {
-        when (feedback) {
-            1 -> {
-                // 用户不满意，降低当前推荐的权重
-                dressingIndexWeight *= 0.9
-                temperatureWeight *= 0.9
-                humidityWeight *= 0.9
-                wearHistoryWeight *= 0.9
-            }
-
-            5 -> {
-                // 用户非常满意，增加当前推荐的权重
-                dressingIndexWeight *= 1.1
-                temperatureWeight *= 1.1
-                humidityWeight *= 1.1
-                wearHistoryWeight *= 1.1
-            }
-        }
-        // 确保权重总和为1
-        val totalWeight =
-            dressingIndexWeight + temperatureWeight + humidityWeight + wearHistoryWeight
-        dressingIndexWeight /= totalWeight
-        temperatureWeight /= totalWeight
-        humidityWeight /= totalWeight
-        wearHistoryWeight /= totalWeight
     }
 
     // 字符串转日期

@@ -21,7 +21,7 @@ data class DailyWeatherResponse(
 )
 
 data class DailyResult(
-    val alert: Alert,
+    val alert: Alert?,
     val daily: DailyData,
     val primary: Int
 )
