@@ -7,10 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.mamh.smartwardrobe.databinding.FragmentClothBinding
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
-
 
 @Suppress("NAME_SHADOWING")
 class ClothFragment : Fragment() {
@@ -23,7 +24,7 @@ class ClothFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private lateinit var listAdapter: ClothListAdapter
+    private lateinit var adapter: ClothListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,12 +53,66 @@ class ClothFragment : Fragment() {
         val viewModel = binding.viewmodel
         if (viewModel != null) {
             // 初始化recycler view adapter也在这里设置点击监听，点击即弹出对话框配置网络参数
-            listAdapter = ClothListAdapter(ClothListClickListener { item ->
+            adapter = ClothListAdapter(ClothListClickListener(
+                clickListener = { item ->
+                    Timber.d("成功点击$item")
+                },
+                longClickListener = { item ->
+                    Timber.d("成功长按$item")
+                    viewModel.repository.setUserHint("还有哪件想要一起搭配呢？ (◍´ಲ`◍)")
+                },
+                swipeLeftListener = { item ->
+                    Timber.d("左滑$item")
+                    viewModel.repository.setUserHint("衣物自动归位中...")
+                    // 在这里添加处理左滑的逻辑，例如发送控制命令到智能衣柜硬件系统
+                },
+                swipeRightListener = { item ->
+                    Timber.d("右滑$item")
+                    viewModel.repository.setUserHint("拾取这件衣服中...")
+                    // 在这里添加处理右滑的逻辑，例如发送控制命令到智能衣柜硬件系统
+                },
+                deleteClickListener = { item ->
+                    Timber.d("删除$item")
+                    viewModel.repository.setUserHint("正在删除此衣物...")
+                    // 在这里添加删除逻辑，例如更新数据库或数据源
+                    viewModel.removeClothItem(item)
+                }
+            ))
 
-                Timber.d("成功点击$item")
+            binding.rvClothList.adapter = adapter
+
+            // 配置 ItemTouchHelper
+            val itemTouchHelper = ItemTouchHelper(object :
+                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    val item = adapter.currentList[position]
+                    when (direction) {
+                        ItemTouchHelper.LEFT -> {
+                            // 处理左滑事件
+                            adapter.notifyItemChanged(position)
+                            adapter.clickListener.onSwipeLeft(item)
+                        }
+
+                        ItemTouchHelper.RIGHT -> {
+                            // 处理右滑事件
+                            adapter.notifyItemChanged(position)
+                            adapter.clickListener.onSwipeRight(item)
+                        }
+                    }
+                }
             })
 
-            binding.rvClothList.adapter = listAdapter
+            itemTouchHelper.attachToRecyclerView(binding.rvClothList)
+
         } else {
             Timber.e("试图设置adapter时ViewModel尚未初始化。")
         }
@@ -71,7 +126,7 @@ class ClothFragment : Fragment() {
         binding.swContainer.setOnRefreshListener {
 
             // 通知适配器数据已更新
-            listAdapter.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
 
             // 下拉刷新时，重新刷新衣物数据
             binding.swContainer.isRefreshing = false

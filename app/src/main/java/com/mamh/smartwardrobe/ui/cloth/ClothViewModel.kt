@@ -21,5 +21,11 @@ class ClothViewModel(application: Application) : AndroidViewModel(application) {
     var clothList: LiveData<List<ClothItem>> = _clothList
 
 
+    // 删除指定的 ClothItem
+    fun removeClothItem(item: ClothItem) {
+        repository.removeClothItem(item)
+    }
+
+
     /// ------------------------- 衣物数据部分-----------------------------------------------------------------------------
 }

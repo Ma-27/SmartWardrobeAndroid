@@ -430,4 +430,11 @@ class AppRepository private constructor(
         _clothList.value = currentList.toList()
     }
 
+    // 删除指定的 ClothItem
+    fun removeClothItem(item: ClothItem) {
+        val currentList = _clothList.value?.toMutableList() ?: mutableListOf()
+        currentList.remove(item)
+        _clothList.value = currentList
+    }
+
 }

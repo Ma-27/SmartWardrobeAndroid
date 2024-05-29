@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
             //对话框视图绑定
             addClothBinding = DialogAddClothBinding.inflate(layoutInflater)
 
-            val addClothHandler = AddClothHandler(addClothBinding, viewModel)
+            val addClothHandler = AddClothHandler(addClothBinding, viewModel, this@MainActivity)
 
             //构建对话框
             MaterialAlertDialogBuilder(it)

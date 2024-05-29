@@ -69,6 +69,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.4.1'
     implementation project(':onenet-sdk')
+    implementation project(':Material-Color-Picker')
 
     //测试
     testImplementation 'junit:junit:4.13.2'

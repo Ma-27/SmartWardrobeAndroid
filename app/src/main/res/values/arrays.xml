@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="cloth_colors">
-        <item>红色</item>
-        <item>蓝色</item>
-        <item>绿色</item>
-        <!-- 其他颜色选项 -->
+    <string-array name="cloth_category">
+        <item>衬衫</item>
+        <item>裤子</item>
+        <item>鞋袜</item>
+        <item>帽子</item>
+        <!-- 其他选项 -->
     </string-array>
 </resources>

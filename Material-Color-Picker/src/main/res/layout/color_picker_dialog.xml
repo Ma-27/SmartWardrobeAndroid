@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="300dp"
+    android:minHeight="170dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_pick_cloth_colour_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="4dp"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:text="选择衣物的颜色"
+            android:textIsSelectable="true"
+            android:textSize="18dp" />
+
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:columnCount="5"
+            app:orientation="horizontal"
+            app:rowCount="4">
+
+            <ImageButton
+                android:id="@+id/b1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b2"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+            <ImageButton
+                android:id="@+id/b3"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b4"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b5"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b6"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b7"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b8"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b9"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b10"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b11"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b12"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b13"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b14"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b15"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b16"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b17"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b18"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b19"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+
+            <ImageButton
+                android:id="@+id/b20"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="6dp" />
+
+        </androidx.gridlayout.widget.GridLayout>
+
+        <Button
+            android:id="@+id/b21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#FFF6E4"
+            android:minHeight="36dp"
+            android:padding="8dp"
+            android:text="选定"
+            android:textColor="#1B5E20" />
+    </LinearLayout>
+
+</ScrollView>

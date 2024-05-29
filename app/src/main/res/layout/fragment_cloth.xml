@@ -69,7 +69,7 @@
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="8dp"
-                    android:text="鞋袜"
+                    android:text="裤子"
                     android:textColor="@color/green_heavy" />
 
                 <Button
@@ -79,7 +79,7 @@
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="8dp"
-                    android:text="裤子"
+                    android:text="鞋袜"
                     android:textColor="@color/green_heavy" />
 
                 <Button

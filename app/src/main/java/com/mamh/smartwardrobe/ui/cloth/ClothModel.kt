@@ -2,6 +2,7 @@ package com.mamh.smartwardrobe.ui.cloth
 
 import com.mamh.smartwardrobe.bean.item.ClothItem
 import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
+import com.mamh.smartwardrobe.data.AppRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -16,6 +17,12 @@ object ClothModel {
     private var temperatureWeight = 0.2
     private var humidityWeight = 0.2
     private var wearHistoryWeight = 0.2
+
+    private val _repository: AppRepository =
+        AppRepository.Builder()
+            .setInternetMode()
+            .build()
+    var repository: AppRepository = _repository
 
     // 定义穿衣指数对应的权重
     private val dressingIndexScores = mapOf(
@@ -47,6 +54,20 @@ object ClothModel {
         cloth: ClothItem
     ): Double {
         return calculateRecommendationScore(weatherDetail, cloth).recommendationScore
+    }
+
+    // 推荐函数，根据单个衣物的情况，去Repository中获取天气信息，计算推荐指数并返回衣物评分
+    fun recommend(
+        cloth: ClothItem
+    ): Double {
+        val weatherDetail = repository.usefulDailyWeatherDetail.value
+        val recommendationScore = weatherDetail?.let {
+            calculateRecommendationScore(it, cloth).recommendationScore
+        } ?: run {
+            // 处理 weatherDetail 为空的情况，返回默认推荐指数
+            0.0  // 或者其他默认值
+        }
+        return recommendationScore
     }
 
     // 计算推荐指数
@@ -99,7 +120,7 @@ object ClothModel {
 
     // 字符串转日期
     private fun String.toDate(): Date {
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val format = SimpleDateFormat("yyyy年M月d日", Locale.getDefault())
         return format.parse(this) ?: Date()
     }
 

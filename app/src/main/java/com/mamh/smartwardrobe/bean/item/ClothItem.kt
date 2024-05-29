@@ -7,11 +7,12 @@ package com.mamh.smartwardrobe.bean.item
  **/
 data class ClothItem(
     val id: String,             // 唯一标识符
-    val name: String,           // 衣服的名字
-    val colors: List<String>,   // 衣物颜色列表
-    val style: String,          // 衣物款式
-    val material: String,       // 衣物材质，如 wool、cotton、linen 等
-    val size: String,           // 衣物尺寸
+    var category: String,       // 类别，比如上衣，裤子等等，用作分类
+    var name: String,           // 衣服的名字
+    var colors: List<String>,   // 衣物颜色列表
+    var style: String,          // 衣物款式
+    var material: String,       // 衣物材质，如 wool、cotton、linen 等
+    var size: String,           // 衣物尺寸
     var isInCloset: Boolean,    // 是否在衣柜中
     var hangPosition: Int,      // 悬挂位置
     val brand: String,          // 品牌
