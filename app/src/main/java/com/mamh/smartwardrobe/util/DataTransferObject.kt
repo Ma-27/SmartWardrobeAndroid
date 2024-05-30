@@ -3,6 +3,8 @@ package com.mamh.smartwardrobe.util
 import android.net.wifi.ScanResult
 import com.mamh.smartwardrobe.bean.flag.NetWorkDefaultConfiguration
 import com.mamh.smartwardrobe.bean.item.WifiItem
+import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
+import com.mamh.smartwardrobe.data.database.weather.WeatherEntity
 
 //data class转换类，负责将一个data class转换为另一个，或者提取数据并映射
 class DataTransferObject {
@@ -25,5 +27,44 @@ class DataTransferObject {
                 )
             }
         }
+
+
+        // 将WeatherEntity转换为UsefulDailyWeatherDetail
+        fun toUsefulDailyWeatherDetail(weather: WeatherEntity): UsefulDailyWeatherDetail {
+            return UsefulDailyWeatherDetail(
+                location = weather.location,
+                temperature = weather.temperature,
+                humidity = weather.humidity,
+                pm25 = weather.pm25,
+                dressingIndex = weather.dressingIndex,
+                dressingAdvice = weather.dressingAdvice,
+                weatherCondition = weather.weatherCondition,
+                comfortIndex = weather.comfortIndex,
+                comfortDescription = weather.comfortDescription
+            )
+        }
+
+
+        // 将UsefulDailyWeatherDetail转换为WeatherEntity
+        fun toWeatherEntity(weatherDetail: UsefulDailyWeatherDetail): WeatherEntity {
+            return WeatherEntity(
+                location = weatherDetail.location,
+                temperature = weatherDetail.temperature,
+                humidity = weatherDetail.humidity,
+                pm25 = weatherDetail.pm25,
+                dressingIndex = weatherDetail.dressingIndex,
+                dressingAdvice = weatherDetail.dressingAdvice,
+                weatherCondition = weatherDetail.weatherCondition,
+                comfortIndex = weatherDetail.comfortIndex,
+                comfortDescription = weatherDetail.comfortDescription
+            )
+        }
+
+
+        // 生成默认的UsefulDailyWeatherDetail
+        fun generateDefaultWeatherDetail(): UsefulDailyWeatherDetail {
+            return UsefulDailyWeatherDetail()
+        }
+
     }
 }

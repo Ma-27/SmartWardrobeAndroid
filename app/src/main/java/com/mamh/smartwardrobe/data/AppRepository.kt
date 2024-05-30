@@ -314,17 +314,17 @@ class AppRepository private constructor(
                         latlng.value!!
                     )
 
-                dailyWeatherResponse?.let {
-                    Timber.d("成功获取当日天气数据: $it")
-                    extractDailyWeatherDetails(it)
-
-                } ?: run {
+                if (dailyWeatherResponse != null) {
+                    Timber.d("成功获取当日天气数据: $dailyWeatherResponse")
+                    // 提取有用的天气数据（全局需要使用）
+                    return@withContext extractDailyWeatherDetails(dailyWeatherResponse)
+                } else {
                     Timber.e("获取天气数据失败: 响应为空")
-                    null
+                    return@withContext null
                 }
             } catch (e: Exception) {
                 Timber.e(e, "获取天气数据时出错")
-                null
+                return@withContext null
             }
         }
     }

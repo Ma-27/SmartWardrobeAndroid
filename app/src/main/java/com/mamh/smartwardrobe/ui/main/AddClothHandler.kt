@@ -193,7 +193,7 @@ class AddClothHandler(
             id = uniqueId,
             name = clothName,
             category = selectedCategory,
-            colors = selectedColors.toList(), // 将集合转换为列表并赋值给 colors 属性
+            colors = selectedColors.toMutableList(), // 将集合转换为列表并赋值给 colors 属性
             style = clothStyle,
             material = clothMaterial,
             size = "default size",

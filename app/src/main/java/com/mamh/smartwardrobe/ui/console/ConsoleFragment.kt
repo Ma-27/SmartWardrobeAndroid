@@ -23,10 +23,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
+import com.mamh.smartwardrobe.data.database.weather.WeatherDao
 import com.mamh.smartwardrobe.data.serialize.CommandDatagram
 import com.mamh.smartwardrobe.databinding.FragmentConsoleBinding
+import com.mamh.smartwardrobe.util.DataTransferObject
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.CountDownLatch
 
@@ -48,6 +53,9 @@ class ConsoleFragment : Fragment() {
     // 初始化一个 CountDownLatch，计数设置为 1。同步任务控制
     private val latch = CountDownLatch(1)
 
+    // 获取数据库中天气表实例
+    private lateinit var weatherDao: WeatherDao
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,6 +70,8 @@ class ConsoleFragment : Fragment() {
 
         binding.viewmodel = consoleViewModel
         binding.lifecycleOwner = viewLifecycleOwner
+
+        weatherDao = SmartWardrobeDatabase.getInstance(requireActivity().application).weatherDao
 
         setListener()
 
@@ -147,11 +157,37 @@ class ConsoleFragment : Fragment() {
                                 override fun onProviderEnabled(provider: String) {}
                                 override fun onProviderDisabled(provider: String) {}
                             })
+
+                        // 这里更新天气数据
+                        binding.viewmodel!!.repository.setUserHint("智能衣柜数据已刷新")
                     }
                 }
-                // 这里先不更新天气，因为数据没有更新
+                // 如果获取不到网络信息，则使用数据库中的更新
+                else {
+                    // 网络连接失败时，从Room数据库中加载天气信息
+                    val weatherData = weatherDao.getLatestWeatherData()
+                    // 转换数据类型
+                    var weatherDetail = weatherData.value?.let {
+                        // 防止bug
+                        weatherData.observe(viewLifecycleOwner, Observer {
+                            Timber.w("Weather data updated from local database: ${it.weatherCondition}")
+                        })
+                        // 返回转换
+                        DataTransferObject.toUsefulDailyWeatherDetail(
+                            it
+                        )
+                    }
+
+                    if (weatherDetail == null) {
+                        Timber.e("Database is null")
+                        weatherDetail = DataTransferObject.generateDefaultWeatherDetail()
+                    }
+
+                    // 更新ViewModel中的天气信息
+                    consoleViewModel.setWeatherDetail(weatherDetail)
+                }
+                // 停止刷新动画
                 binding.swipeRefreshLayout.isRefreshing = false
-                binding.viewmodel!!.repository.setUserHint("智能衣柜数据已刷新")
             }
         }
 
@@ -193,7 +229,33 @@ class ConsoleFragment : Fragment() {
                                 // 记录更新结果
                                 Timber.d("Weather data by transformation to live data: $weatherDetail")
                                 weatherDetail // 返回非空的 UsefulDailyWeatherDetail 对象
-                        }
+
+                                // 存储到Room数据库
+                                // 更新数据库中的天气数据
+                                val weatherEntity =
+                                    DataTransferObject.toWeatherEntity(weatherDetail)
+                                withContext(Dispatchers.IO) {
+                                    weatherDao.insertSingleWeather(weatherEntity)
+                                    // 确认对象
+                                    Timber.d("Database: ")
+                                    Timber.d(
+                                        SmartWardrobeDatabase.getInstance(requireActivity().application)
+                                            .toString()
+                                    )
+                                }
+
+                                // 查询数据库
+                                val latestWeather = weatherDao.getLatestWeatherData().value
+                                withContext(Dispatchers.IO) {
+                                    if (latestWeather != null) {
+                                        Timber.d("Database: ${latestWeather.weatherCondition}")
+                                    } else {
+                                        Timber.d("Database: No weather data found")
+                                    }
+                                }
+
+
+                            }
                         // 更新结束
                     }
                 }
