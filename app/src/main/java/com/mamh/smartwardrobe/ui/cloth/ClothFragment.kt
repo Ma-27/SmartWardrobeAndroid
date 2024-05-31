@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.mamh.smartwardrobe.R
 import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
 import com.mamh.smartwardrobe.data.database.cloth.ClothDao
 import com.mamh.smartwardrobe.data.serialize.CommandDatagram
@@ -35,6 +38,19 @@ class ClothFragment : Fragment() {
 
     // 获取数据库中衣物表实例
     private lateinit var clothDao: ClothDao
+
+    // 衬衫筛选开关
+    private var isShirtFilterEnabled = false
+
+    // 裤子筛选开关
+    private var isTrousersFilterEnabled = false
+
+    // 鞋袜筛选开关
+    private var isShoesFilterEnabled = false
+
+    // 帽子筛选开关
+    private var isHatFilterEnabled = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -231,6 +247,81 @@ class ClothFragment : Fragment() {
             adapter.submitList(clothItems)
         }
 
+
+        // 实现分类功能，通过标签筛选是衬衫的衣物
+        binding.btnShirt.setOnClickListener {
+            isShirtFilterEnabled = setupFilterButton(
+                binding.btnShirt,
+                isShirtFilterEnabled,
+                "衬衫",
+                R.color.green_heavy,
+                R.color.white
+            )
+        }
+
+
+        // 实现分类功能，通过标签筛选是裤子的衣物
+        binding.btnTrousers.setOnClickListener {
+            isTrousersFilterEnabled = setupFilterButton(
+                binding.btnTrousers,
+                isTrousersFilterEnabled,
+                "裤子",
+                R.color.green_heavy,
+                R.color.white
+            )
+        }
+
+
+        // 实现分类功能，通过标签筛选是鞋袜的衣物
+        binding.btnShoes.setOnClickListener {
+            isShoesFilterEnabled = setupFilterButton(
+                binding.btnShoes,
+                isShoesFilterEnabled,
+                "鞋袜",
+                R.color.green_heavy,
+                R.color.white
+            )
+        }
+
+
+        // 实现分类功能，通过标签筛选是帽子的衣物
+        binding.btnHat.setOnClickListener {
+            isHatFilterEnabled = setupFilterButton(
+                binding.btnHat,
+                isHatFilterEnabled,
+                "帽子",
+                R.color.green_heavy,
+                R.color.white
+            )
+        }
+
+    }
+
+
+    // 定义一个通用的函数来处理筛选逻辑
+    private fun setupFilterButton(
+        button: Button,
+        filterEnabled: Boolean,
+        category: String,
+        colorSelected: Int,
+        colorDefault: Int
+    ): Boolean {
+        val newFilterEnabled = !filterEnabled
+        button.backgroundTintList = ContextCompat.getColorStateList(
+            requireContext(),
+            if (newFilterEnabled) colorSelected else colorDefault
+        )
+
+        clothViewModel.clothList.observe(viewLifecycleOwner) {
+            val filteredList = if (newFilterEnabled) {
+                it.filter { item -> item.category == category }
+            } else {
+                it
+            }
+            adapter.submitList(filteredList)
+        }
+
+        return newFilterEnabled
     }
 
 }
