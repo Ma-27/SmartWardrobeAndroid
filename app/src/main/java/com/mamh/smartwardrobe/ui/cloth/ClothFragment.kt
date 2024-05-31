@@ -7,10 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
+import com.mamh.smartwardrobe.data.database.cloth.ClothDao
+import com.mamh.smartwardrobe.data.serialize.CommandDatagram
 import com.mamh.smartwardrobe.databinding.FragmentClothBinding
+import com.mamh.smartwardrobe.util.DataTransferObject
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Suppress("NAME_SHADOWING")
@@ -26,6 +33,9 @@ class ClothFragment : Fragment() {
 
     private lateinit var adapter: ClothListAdapter
 
+    // 获取数据库中衣物表实例
+    private lateinit var clothDao: ClothDao
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,6 +49,8 @@ class ClothFragment : Fragment() {
 
         binding.viewmodel = clothViewModel
         binding.lifecycleOwner = viewLifecycleOwner
+
+        clothDao = SmartWardrobeDatabase.getInstance(requireActivity().application).clothDao
 
 
         setupAdapter()
@@ -57,25 +69,77 @@ class ClothFragment : Fragment() {
                 clickListener = { item ->
                     Timber.d("成功点击$item")
                 },
+
+
                 longClickListener = { item ->
                     Timber.d("成功长按$item")
                     viewModel.repository.setUserHint("还有哪件想要一起搭配呢？ (◍´ಲ`◍)")
                 },
+
+
                 swipeLeftListener = { item ->
                     Timber.d("左滑$item")
-                    viewModel.repository.setUserHint("衣物自动归位中...")
                     // 在这里添加处理左滑的逻辑，例如发送控制命令到智能衣柜硬件系统
+
+                    // 转化item到MCU的衣物数据结构
+                    val mcuItem = DataTransferObject.fromClothItemToMCU(item)
+
+                    // 包装报文
+                    val homingCommand = CommandDatagram.Builder()
+                        .setDeviceId(1)
+                        .setFrom(0)
+                        .setPacketType("Command")
+                        .setCommand("Actuator-Control")
+                        .setActuator("Shelf")
+                        .setAction("homing")
+                        .setRemark("Command aims to homing cloth to an empty position.")
+                        .setCloth(mcuItem) // 添加 setCloth 调用
+                        .build()
+
+                    // 转换为JSON字符串并发送
+                    val datagram = homingCommand.toJsonString()
+                    clothViewModel.sendData(datagram)
+
+                    Timber.d(datagram)
+                    viewModel.repository.setUserHint("衣物自动归位中...")
                 },
+
+
                 swipeRightListener = { item ->
                     Timber.d("右滑$item")
-                    viewModel.repository.setUserHint("拾取这件衣服中...")
                     // 在这里添加处理右滑的逻辑，例如发送控制命令到智能衣柜硬件系统
+
+                    // 转化item到MCU的衣物数据结构
+                    val mcuItem = DataTransferObject.fromClothItemToMCU(item)
+
+                    // 包装报文
+                    val fetchCommand = CommandDatagram.Builder()
+                        .setDeviceId(1)
+                        .setFrom(0)
+                        .setPacketType("Command")
+                        .setCommand("Actuator-Control")
+                        .setActuator("Shelf")
+                        .setAction("fetch")
+                        .setRemark("Command to fetch the cloth to the default position.")
+                        .setCloth(mcuItem) // 添加 setCloth 调用
+                        .build()
+
+                    // 转换为JSON字符串并发送
+                    val datagram = fetchCommand.toJsonString()
+                    clothViewModel.sendData(datagram)
+
+                    Timber.d(datagram)
+                    viewModel.repository.setUserHint("拾取这件衣服中...")
                 },
+
+
                 deleteClickListener = { item ->
                     Timber.d("删除$item")
                     viewModel.repository.setUserHint("正在删除此衣物...")
                     // 在这里添加删除逻辑，例如更新数据库或数据源
-                    viewModel.removeClothItem(item)
+                    lifecycleScope.launch {
+                        viewModel.removeClothItem(item, clothDao)
+                    }
                 }
             ))
 
@@ -124,6 +188,11 @@ class ClothFragment : Fragment() {
     private fun setListener() {
         // 设置SwipeRefreshLayout的下拉刷新监听
         binding.swContainer.setOnRefreshListener {
+            // 请求数据库数据
+
+
+            // 通知MCU，同步数据列表 todo
+
 
             // 通知适配器数据已更新
             adapter.notifyDataSetChanged()
@@ -133,6 +202,35 @@ class ClothFragment : Fragment() {
 
             binding.viewmodel!!.repository.setUserHint("衣物数据已刷新")
         }
+
+
+        // 监听衣物列表数据变化，如果数据变化，更新adapter。如果列表为空，则请求数据库数据
+        clothViewModel.clothList.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                // 请求数据库数据
+                GlobalScope.launch {
+                    clothDao.getAllClothes()
+                }
+            }
+            adapter.submitList(it)
+        }
+
+
+        // 监听数据库的变化
+        clothDao.getAllClothes().observe(viewLifecycleOwner) { clothEntities ->
+            Timber.d("获取数据库中的衣物列表到页面中")
+
+            // 将 ClothItemEntity 列表转换为 ClothItem 列表
+            val clothItems =
+                DataTransferObject.fromClothItemEntityListToClothItemList(clothEntities)
+
+            // 更新 ViewModel 中的 LiveData
+            clothViewModel.setClothList(clothItems)
+
+            // 数据库数据变化时，更新adapter
+            adapter.submitList(clothItems)
+        }
+
     }
 
 }

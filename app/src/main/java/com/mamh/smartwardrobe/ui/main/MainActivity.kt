@@ -52,6 +52,10 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_READ_PHONE_STATE = 4
     private val REQUEST_CHANGE_WIFI_STATE = 5
 
+    // 获取数据库中衣物表实例
+    // private val clothDao = SmartWardrobeDatabase.getInstance().clothDao
+    // val allCloths: LiveData<List<ClothItemEntity>> = clothDao.getAllClothes()
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -182,6 +186,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // 如果列表为空，则查询衣物数据库
+        viewModel.clothList.observe(this, Observer {
+            Timber.d("衣物列表更新")
+        })
+
+        // 如果数据库中有更新，则将其更新到列表，并且去重
+        // clothDao
+
+
         //刷新状态更新的snackBar提示
         viewModel.repository.userHint.observe(this, Observer {
             viewModel.repository.userHint.value?.let { it ->
@@ -200,10 +213,25 @@ class MainActivity : AppCompatActivity() {
 
             val addClothHandler = AddClothHandler(addClothBinding, viewModel, this@MainActivity)
 
+            // 点下提交键之后，创建衣物数据对象，并且更新列表
+            addClothBinding.btnAddCloth.setOnClickListener {
+                val item = addClothHandler.createClothItem()
+
+                item?.let {
+                    viewModel.addCloth(it)
+                    GlobalScope.launch {
+                        addClothHandler.insertClothItemToDatabase(it)
+                    }
+                    // 创建衣物数据对象后，显示成功提示信息
+                    viewModel.repository.setUserHint("衣物信息添加成功")
+                }
+            }
+
             //构建对话框
             MaterialAlertDialogBuilder(it)
                 .setView(addClothBinding.root)
                 .show()
+
         }
     }
 

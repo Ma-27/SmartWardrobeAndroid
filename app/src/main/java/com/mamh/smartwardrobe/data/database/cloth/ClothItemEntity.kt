@@ -2,10 +2,8 @@ package com.mamh.smartwardrobe.data.database.cloth
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.mamh.smartwardrobe.data.database.user.UserEntity
 
 
 /**
@@ -17,17 +15,19 @@ import com.mamh.smartwardrobe.data.database.user.UserEntity
 
 @Entity(
     tableName = "clothes",
+    /*
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
         parentColumns = ["userId"],
         childColumns = ["userId"],
         onDelete = ForeignKey.CASCADE
     )],
+     */
     indices = [Index(value = ["userId"])]
 )
 data class ClothItemEntity(
     @PrimaryKey(autoGenerate = false)
-    val clothId: Int, // 手动分配ID
+    val clothId: String,
 
     @ColumnInfo(name = "userId")
     val userId: Int,

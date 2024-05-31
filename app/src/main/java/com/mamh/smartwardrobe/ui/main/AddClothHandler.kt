@@ -13,12 +13,19 @@ import android.graphics.Color
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.lifecycle.LiveData
+import com.mamh.smartwardrobe.SmartWardrobeApplication
 import com.mamh.smartwardrobe.bean.item.ClothItem
 import com.mamh.smartwardrobe.data.AppRepository
+import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
+import com.mamh.smartwardrobe.data.database.cloth.ClothItemEntity
 import com.mamh.smartwardrobe.databinding.DialogAddClothBinding
 import com.mamh.smartwardrobe.ui.cloth.ClothModel
+import com.mamh.smartwardrobe.util.DataTransferObject
 import com.mamh.smartwardrobe.util.Utility
 import com.turkialkhateeb.materialcolorpicker.ColorChooserDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Random
 
@@ -55,6 +62,11 @@ class AddClothHandler(
     // 用于存储颜色信息的集合
     private val selectedColors: MutableSet<String> = HashSet()
 
+    // 获取数据库中衣物表实例
+    private val clothDao =
+        SmartWardrobeDatabase.getInstance(SmartWardrobeApplication.context).clothDao
+    val allCloths: LiveData<List<ClothItemEntity>> = clothDao.getAllClothes()
+
     init {
         // 控件的点击逻辑
         setListener()
@@ -62,13 +74,6 @@ class AddClothHandler(
 
     // 设置按钮点击监听器和其它控件的监听器
     private fun setListener() {
-        // 点下提交键之后，创建衣物数据对象，并且更新列表
-        binding.btnAddCloth.setOnClickListener {
-            createClothItem()?.let { it1 -> viewModel.addCloth(it1) }
-            // 创建衣物数据对象后，显示成功提示信息
-            viewModel.repository.setUserHint("衣物信息添加成功")
-        }
-
         binding.btnColorPicker.setOnClickListener {
             // 跳转到颜色选择界面
             // 选择颜色后，将颜色信息填入到方块视图中
@@ -160,7 +165,7 @@ class AddClothHandler(
     /**
      * 创建并返回衣物数据对象
      */
-    private fun createClothItem(): ClothItem? {
+    fun createClothItem(): ClothItem? {
         // 从 EditText 和 Spinner 中获取用户输入的衣物信息
 
         // 名称
@@ -200,7 +205,7 @@ class AddClothHandler(
             isInCloset = true,
             hangPosition = 0,
             brand = "brand_default",
-            purchaseDate = "2024-5-15",
+            purchaseDate = "2024年5月15日",
             isClean = true,
             lastWornDate = Utility.getCurrentDate(),
             tags = mutableListOf(clothLabel, generatedFeature),
@@ -211,6 +216,15 @@ class AddClothHandler(
         clothItem.recommendationScore = ClothModel.recommend(clothItem)
 
         return clothItem
+    }
+
+    suspend fun insertClothItemToDatabase(clothItem: ClothItem) {
+        withContext(Dispatchers.IO) {
+            // 将 ClothItem 转换为 ClothItemEntity fixme userID给了0
+            val clothItemEntity = DataTransferObject.fromClothItemToEntity(clothItem, 0)
+            // 插入到数据库
+            clothDao.insertCloth(clothItemEntity)
+        }
     }
 
     private fun generateUniqueId(): String {

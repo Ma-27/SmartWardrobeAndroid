@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
 import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
 import com.mamh.smartwardrobe.data.database.weather.WeatherDao
 import com.mamh.smartwardrobe.data.serialize.CommandDatagram
@@ -165,26 +166,7 @@ class ConsoleFragment : Fragment() {
                 // 如果获取不到网络信息，则使用数据库中的更新
                 else {
                     // 网络连接失败时，从Room数据库中加载天气信息
-                    val weatherData = weatherDao.getLatestWeatherData()
-                    // 转换数据类型
-                    var weatherDetail = weatherData.value?.let {
-                        // 防止bug
-                        weatherData.observe(viewLifecycleOwner, Observer {
-                            Timber.w("Weather data updated from local database: ${it.weatherCondition}")
-                        })
-                        // 返回转换
-                        DataTransferObject.toUsefulDailyWeatherDetail(
-                            it
-                        )
-                    }
-
-                    if (weatherDetail == null) {
-                        Timber.e("Database is null")
-                        weatherDetail = DataTransferObject.generateDefaultWeatherDetail()
-                    }
-
-                    // 更新ViewModel中的天气信息
-                    consoleViewModel.setWeatherDetail(weatherDetail)
+                    queryWeatherRoomDatabase()
                 }
                 // 停止刷新动画
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -228,33 +210,11 @@ class ConsoleFragment : Fragment() {
                                 consoleViewModel.setWeatherDetail(weatherDetail)
                                 // 记录更新结果
                                 Timber.d("Weather data by transformation to live data: $weatherDetail")
+
+                                // 将其更新到数据库中
+                                updateWeatherRoomDatabase(weatherDetail)
+
                                 weatherDetail // 返回非空的 UsefulDailyWeatherDetail 对象
-
-                                // 存储到Room数据库
-                                // 更新数据库中的天气数据
-                                val weatherEntity =
-                                    DataTransferObject.toWeatherEntity(weatherDetail)
-                                withContext(Dispatchers.IO) {
-                                    weatherDao.insertSingleWeather(weatherEntity)
-                                    // 确认对象
-                                    Timber.d("Database: ")
-                                    Timber.d(
-                                        SmartWardrobeDatabase.getInstance(requireActivity().application)
-                                            .toString()
-                                    )
-                                }
-
-                                // 查询数据库
-                                val latestWeather = weatherDao.getLatestWeatherData().value
-                                withContext(Dispatchers.IO) {
-                                    if (latestWeather != null) {
-                                        Timber.d("Database: ${latestWeather.weatherCondition}")
-                                    } else {
-                                        Timber.d("Database: No weather data found")
-                                    }
-                                }
-
-
                             }
                         // 更新结束
                     }
@@ -554,7 +514,50 @@ class ConsoleFragment : Fragment() {
         }
 
 
+        // 查询数据库,使用观察者模式观察更改
+        // 观察 LiveData
+        weatherDao.getLatestWeatherData().observe(viewLifecycleOwner, Observer { latestWeather ->
+            if (latestWeather != null) {
+                Timber.d("Database has been found,weather condition: ${latestWeather.weatherCondition}")
+                // 将其存储
+                consoleViewModel.setWeatherDetail(latestWeather.let {
+                    DataTransferObject.toUsefulDailyWeatherDetail(
+                        it
+                    )
+                })
+            } else {
+                Timber.d("Database: No weather data found")
+            }
+        })
     }
+
+
+    // 将数据更新到RoomDatabase
+    suspend fun updateWeatherRoomDatabase(weatherDetail: UsefulDailyWeatherDetail) {
+        withContext(Dispatchers.IO) {
+            // 存储到Room数据库
+            // 更新数据库中的天气数据
+            val weatherEntity =
+                DataTransferObject.toWeatherEntity(weatherDetail)
+
+            weatherDao.insertSingleWeather(weatherEntity)
+            // 确认对象
+            Timber.d("Database: ")
+            Timber.d(
+                SmartWardrobeDatabase.getInstance(requireActivity().application)
+                    .toString()
+            )
+        }
+    }
+
+    // 从RoomDatabase查询数据
+    private suspend fun queryWeatherRoomDatabase() {
+        return withContext(Dispatchers.IO) {
+            // 查询 Room 数据库
+            val weatherEntity = weatherDao.getLatestWeatherData()
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

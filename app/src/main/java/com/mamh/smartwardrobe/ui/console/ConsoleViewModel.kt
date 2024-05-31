@@ -8,6 +8,8 @@ import com.mamh.smartwardrobe.bean.flag.MessageType
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
 import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
 import com.mamh.smartwardrobe.data.AppRepository
+import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
+import com.mamh.smartwardrobe.data.database.weather.WeatherDao
 import com.mamh.smartwardrobe.util.itembuild.DataItemBuilder
 
 class ConsoleViewModel(application: Application) : AndroidViewModel(application) {
@@ -16,6 +18,9 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
             .setInternetMode()
             .build()
     var repository: AppRepository = _repository
+
+    // 获取数据库中天气表实例
+    private val weatherDao: WeatherDao = SmartWardrobeDatabase.getInstance(application).weatherDao
 
     /// ------------------------- 其他网络API数据和服务数据部分 --------------------------------------------------------
     // 经纬度信息，默认值为空字符串

@@ -23,7 +23,7 @@ import com.mamh.smartwardrobe.data.database.weather.WeatherEntity
 
 @Database(
     entities = [UserEntity::class, SensorDataEntity::class, ClothItemEntity::class, WeatherEntity::class],
-    version = 4,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(DataTypeConverters::class)

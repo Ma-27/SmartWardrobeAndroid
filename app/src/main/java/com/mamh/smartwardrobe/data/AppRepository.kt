@@ -437,4 +437,9 @@ class AppRepository private constructor(
         _clothList.value = currentList
     }
 
+    fun setClothList(value: List<ClothItem>) {
+        // 更新 ViewModel 中的 LiveData
+        _clothList.value = value
+    }
+
 }

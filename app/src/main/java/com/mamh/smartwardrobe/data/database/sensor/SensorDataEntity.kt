@@ -9,19 +9,19 @@ package com.mamh.smartwardrobe.data.database.sensor
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.mamh.smartwardrobe.data.database.user.UserEntity
 
 @Entity(
     tableName = "sensor_data",
+    /*
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
         parentColumns = ["userId"],
         childColumns = ["userId"],
         onDelete = ForeignKey.CASCADE
     )],
+     */
     indices = [Index(value = ["userId"])]
 )
 data class SensorDataEntity(
