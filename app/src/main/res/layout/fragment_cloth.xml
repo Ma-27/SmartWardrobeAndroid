@@ -63,7 +63,7 @@
                     android:textColor="@color/green_heavy" />
 
                 <Button
-                    android:id="@+id/btn_shoes"
+                    android:id="@+id/btn_trousers"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
@@ -73,7 +73,7 @@
                     android:textColor="@color/green_heavy" />
 
                 <Button
-                    android:id="@+id/btn_trousers"
+                    android:id="@+id/btn_shoes"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"

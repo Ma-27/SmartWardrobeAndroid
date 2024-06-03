@@ -171,31 +171,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star"
-                    android:visibility="@{clothitem.recommendationScore >= 1 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{Math.round(clothitem.recommendationScore) >= 1 ? View.VISIBLE : View.GONE}" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star"
-                    android:visibility="@{clothitem.recommendationScore >= 2 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{Math.round(clothitem.recommendationScore) >= 2 ? View.VISIBLE : View.GONE}" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star"
-                    android:visibility="@{clothitem.recommendationScore >= 3 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{Math.round(clothitem.recommendationScore) >= 3 ? View.VISIBLE : View.GONE}" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star"
-                    android:visibility="@{clothitem.recommendationScore >= 4 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{Math.round(clothitem.recommendationScore) >= 4 ? View.VISIBLE : View.GONE}" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_star"
-                    android:visibility="@{clothitem.recommendationScore >= 5 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{Math.round(clothitem.recommendationScore) >= 5 ? View.VISIBLE : View.GONE}" />
             </LinearLayout>
 
             <ImageButton
