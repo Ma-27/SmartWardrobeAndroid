@@ -15,19 +15,25 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/ns_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/background"
             android:fillViewport="true"
-            android:padding="@dimen/space10">
+            android:focusableInTouchMode="true">
 
             <!--总体约束布局-->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_main"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space5"
+                android:layout_marginTop="@dimen/space5"
+                android:layout_marginEnd="@dimen/space5">
 
                 <!--天气（绿色页面）的布局-->
                 <androidx.cardview.widget.CardView
@@ -36,6 +42,7 @@
                     android:layout_height="150dp"
                     android:layout_marginLeft="@dimen/space5"
                     android:layout_marginRight="@dimen/space5"
+                    android:layout_marginTop="@dimen/space5"
                     app:cardBackgroundColor="#4CAF50"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="@dimen/space10"
@@ -52,16 +59,16 @@
 
                         <TextView
                             android:id="@+id/tv_humidity_hint"
-                            android:layout_width="wrap_content"
+                            android:layout_width="180dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="24dp"
-                            android:layout_marginTop="@dimen/h3"
+                            android:layout_marginTop="14dp"
                             android:padding="4dp"
-                            android:text="空气湿度：较为干燥"
-                            android:textAlignment="center"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.comfortDescription}"
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -70,16 +77,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="sans-serif-medium"
                             android:padding="4dp"
-                            android:text="177"
+                            android:layout_marginStart="36dp"
+                            android:fontFamily="sans-serif"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="36sp"
                             app:layout_constraintBaseline_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="@+id/tv_humidity_hint"
-                            app:layout_constraintHorizontal_bias="0.488"
+                            android:text="@{String.valueOf(viewmodel.usefulDailyWeatherDetail.pm25)}"
                             app:layout_constraintStart_toStartOf="@+id/tv_humidity_hint"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_humidity_hint" />
 
                         <TextView
@@ -87,27 +94,29 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:fontFamily="sans-serif-smallcaps"
+                            android:fontFamily="sans-serif"
                             android:padding="4dp"
-                            android:text="7° 晴朗"
+                            android:text='@{String.valueOf(viewmodel.usefulDailyWeatherDetail.temperature) + "°C " + viewmodel.usefulDailyWeatherDetail.weatherCondition}'
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="32sp"
                             app:layout_constraintEnd_toEndOf="@+id/textView4"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
                         <TextView
                             android:id="@+id/textView4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="14dp"
                             android:layout_marginEnd="24dp"
                             android:padding="4dp"
-                            android:text="重庆 南岸"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.location}"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             app:layout_constraintEnd_toEndOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
@@ -118,12 +127,13 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="16dp"
                             android:fontFamily="serif"
-                            android:text="建议穿棉衣+厚实的保暖衣服，外穿较薄的羽绒服"
+                            android:text="@{viewmodel.usefulDailyWeatherDetail.dressingAdvice}"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -138,7 +148,7 @@
                     android:layout_marginTop="@dimen/space15"
                     android:layout_marginEnd="24dp"
                     android:padding="10dp"
-                    app:cardBackgroundColor="#FAFAFA"
+                    app:cardBackgroundColor="#FFFDE7"
                     app:cardCornerRadius="@dimen/space20"
                     app:cardElevation="@dimen/space5"
                     app:cardPreventCornerOverlap="true"
@@ -154,7 +164,7 @@
 
                         <ImageView
                             android:id="@+id/imageView2"
-                            android:layout_width="75dp"
+                            android:layout_width="64dp"
                             android:layout_height="0dp"
                             android:layout_marginTop="8dp"
                             android:src="@drawable/ic_wifi_no_strength"
@@ -174,6 +184,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
                         <TextView
@@ -190,6 +201,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined1" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -202,6 +214,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space15"
                     android:layout_marginEnd="@dimen/space5"
+                    android:layout_marginBottom="0dp"
                     app:cardBackgroundColor="#3D5AFE"
                     app:cardCornerRadius="@dimen/space20"
                     app:cardElevation="@dimen/space5"
@@ -235,12 +248,10 @@
                             android:layout_marginBottom="8dp"
                             android:rotation="270"
                             android:thumbTint="@color/white"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintBottom_toTopOf="@+id/segmented_button_temperature"
                             app:layout_constraintEnd_toStartOf="@+id/iv_temperature_photo"
-                            app:layout_constraintHorizontal_bias="0.482"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.0" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/tv_undefined2"
@@ -248,12 +259,14 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="当前温度"
+                            android:layout_marginTop="3dp"
+                            android:text="柜内温度"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/iv_temperature_photo" />
 
                         <TextView
@@ -266,8 +279,10 @@
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:layout_marginTop="3dp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined2" />
 
                         <TextView
@@ -276,13 +291,15 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="设定温度"
+                            android:text="目标温度"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:layout_marginTop="3dp"
                             app:layout_constraintBottom_toTopOf="@+id/tv_temperature_setting"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_temperature_home" />
 
                         <TextView
@@ -291,29 +308,71 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="serif"
                             android:padding="2dp"
-                            android:text="@{String.format(@string/temperature_with_unit_int, viewmodel.pendingTemperature)}"
+                            android:text="@{String.format(@string/temperature_with_unit_int, viewmodel.targetTemperature)}"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:layout_marginTop="3dp"
                             app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                             app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined3" />
 
                         <Switch
                             android:id="@+id/switch_temperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
+                            android:layout_marginTop="3dp"
                             android:checked="@{viewmodel.temperatureControlAuto}"
                             android:fontFamily="serif"
                             android:padding="2dp"
                             android:textAlignment="center"
                             android:textSize="18sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintBottom_toTopOf="@id/segmented_button_temperature"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/tv_temperature_setting"
                             tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/segmented_button_temperature"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginTop="3dp"
+                            android:layout_marginBottom="3dp"
+                            android:fontFamily="serif"
+                            android:orientation="horizontal"
+                            android:padding="2dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/switch_temperature">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/segmented_button_temperature_heat"
+                                style="@style/CustomMaterialButtonTemperature"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checkable="true"
+                                android:checked="false"
+                                android:fontFamily="serif"
+                                android:text="增温" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/segmented_button_temperature_cool"
+                                style="@style/CustomMaterialButtonTemperature"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checkable="true"
+                                android:checked="false"
+                                android:fontFamily="serif"
+                                android:text="降温" />
+
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -348,7 +407,7 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
                             android:src="@drawable/ic_humidity"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintBottom_toTopOf="@+id/segmented_button_humidity"
                             app:layout_constraintDimensionRatio="1"
                             app:layout_constraintEnd_toStartOf="@+id/tv_undefined4"
                             app:layout_constraintStart_toStartOf="parent"
@@ -361,155 +420,143 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="8dp"
                             android:padding="2dp"
-                            android:text="湿度"
+                            android:text="柜内湿度"
                             android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_humidity"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/tv_humidity_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="3dp"
                             android:fontFamily="serif"
                             android:padding="2dp"
                             android:text="@{String.format(@string/humidity_with_unit, viewmodel.currentHumidity)}"
                             android:textAlignment="center"
                             android:textSize="18sp"
+                            android:textColor="@color/white"
                             app:layout_constraintEnd_toEndOf="@+id/tv_undefined4"
                             app:layout_constraintStart_toStartOf="@+id/tv_undefined4"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toBottomOf="@+id/tv_undefined4" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:id="@+id/tv_undefined7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:fontFamily="serif"
+                            android:padding="2dp"
+                            android:text="目标湿度"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="@+id/tv_humidity_value"
+                            app:layout_constraintStart_toStartOf="@+id/tv_humidity_value"
+                            android:textIsSelectable="true"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_humidity_value" />
 
-                <!--亮度设定（右边第二个方块）的布局-->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_light"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="@dimen/space15"
-                    android:layout_marginEnd="@dimen/space5"
-                    android:layout_marginBottom="@dimen/space15"
-                    android:padding="10dp"
-                    app:cardBackgroundColor="#FFECB3"
-                    app:cardCornerRadius="@dimen/space20"
-                    app:cardElevation="@dimen/space5"
-                    app:cardPreventCornerOverlap="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toEndOf="@+id/cv_humidity"
-                    app:layout_constraintTop_toBottomOf="@+id/cv_temperature">
+                        <EditText
+                            android:id="@+id/et_humidity_setting"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:fontFamily="serif"
+                            android:layout_margin="2dp"
+                            android:backgroundTint="@color/white"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:inputType="number"
+                            app:layout_constraintEnd_toEndOf="@+id/tv_undefined7"
+                            app:layout_constraintStart_toStartOf="@+id/tv_undefined7"
+                            android:textIsSelectable="true"
+                            android:maxLength="3"
+                            android:text='@{String.valueOf(viewmodel.targetHumidity) + "%" }'
+                            app:layout_constraintTop_toBottomOf="@+id/tv_undefined7" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:context=".ui.console.ConsoleFragment">
 
-                        <ImageView
-                            android:id="@+id/iv_light"
-                            android:layout_width="0dp"
-                            android:layout_height="64dp"
-                            android:layout_marginTop="12dp"
-                            android:layout_marginBottom="12dp"
-                            android:src="@drawable/ic_light"
+
+                        <Switch
+                            android:id="@+id/switch_humidity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:fontFamily="serif"
+                            android:padding="2dp"
+                            android:textAlignment="center"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="@+id/tv_humidity_value"
+                            app:layout_constraintStart_toStartOf="@+id/tv_humidity_value"
+                            app:layout_constraintTop_toBottomOf="@+id/et_humidity_setting"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/segmented_button_humidity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginBottom="2dp"
+                            android:layout_marginTop="3dp"
+                            android:fontFamily="serif"
+                            android:orientation="horizontal"
+                            android:padding="2dp"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintDimensionRatio="1"
-                            app:layout_constraintEnd_toStartOf="@+id/tv_undefined5"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toBottomOf="@+id/switch_humidity">
 
-                        <TextView
-                            android:id="@+id/tv_undefined5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:padding="2dp"
-                            android:text="灯光"
-                            android:textAlignment="center"
-                            android:textColor="@color/black"
-                            android:textSize="18sp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/iv_light"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/segmented_button_humidity_increase"
+                                style="@style/CustomMaterialButtonHumidity"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checkable="true"
+                                android:checked="false"
+                                android:fontFamily="serif"
+                                android:text="加湿" />
 
-                        <Switch
-                            android:id="@+id/switch_light"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:checked="@{viewmodel.lightOn}"
-                            android:fontFamily="serif"
-                            android:padding="2dp"
-                            android:textAlignment="center"
-                            android:textSize="18sp"
-                            app:layout_constraintEnd_toEndOf="@+id/tv_undefined5"
-                            app:layout_constraintStart_toStartOf="@+id/tv_undefined5"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_undefined5"
-                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/segmented_button_humidity_decrease"
+                                style="@style/CustomMaterialButtonHumidity"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:checkable="true"
+                                android:checked="false"
+                                android:fontFamily="serif"
+                                android:text="除湿" />
 
-                        <TextView
-                            android:id="@+id/tv_undefined10"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:padding="2dp"
-                            android:text="自动"
-                            android:textAlignment="center"
-                            android:textColor="@color/black"
-                            android:textSize="18sp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/iv_light"
-                            app:layout_constraintTop_toBottomOf="@id/switch_light" />
-
-                        <Switch
-                            android:id="@+id/switch_light_auto"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:checked="@{viewmodel.lightControlAuto}"
-                            android:fontFamily="serif"
-                            android:padding="2dp"
-                            android:textAlignment="center"
-                            android:textSize="18sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="@+id/tv_undefined5"
-                            app:layout_constraintStart_toStartOf="@+id/tv_undefined5"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_undefined10"
-
-                            tools:ignore="UseSwitchCompatOrMaterialXml" />
-
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-
-                <!--门锁（左边第三个方块）的布局-->
+                <!--门锁（右边第二个方块）的布局-->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cv_lock"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space5"
                     android:layout_marginTop="@dimen/space15"
-                    android:layout_marginEnd="24dp"
+                    android:layout_marginEnd="5dp"
                     android:padding="10dp"
                     app:cardBackgroundColor="#69F0AE"
                     app:cardCornerRadius="@dimen/space20"
                     app:cardElevation="@dimen/space5"
                     app:cardPreventCornerOverlap="true"
-                    app:layout_constraintEnd_toStartOf="@+id/cv_temperature"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cv_humidity">
+                    app:layout_constraintStart_toStartOf="@+id/cv_temperature"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_temperature">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -544,6 +591,7 @@
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/iv_lock"
+                            android:textIsSelectable="true"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <Switch
@@ -551,6 +599,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:layout_marginBottom="108dp"
                             android:fontFamily="serif"
                             android:padding="2dp"
                             android:textAlignment="center"
@@ -564,14 +613,125 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
+                <!--亮度设定（左边第二个方块）的布局-->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_light"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space5"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginTop="@dimen/space15"
+                    android:layout_marginBottom="64dp"
+                    android:padding="10dp"
+                    app:cardBackgroundColor="#FFECB3"
+                    app:cardCornerRadius="@dimen/space20"
+                    app:cardElevation="@dimen/space5"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintEnd_toEndOf="@id/cv_humidity"
+                    app:layout_constraintEnd_toStartOf="@+id/cv_temperature"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_humidity">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:context=".ui.console.ConsoleFragment">
+
+                        <ImageView
+                            android:id="@+id/iv_light"
+                            android:layout_width="0dp"
+                            android:layout_height="64dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:src="@drawable/ic_light"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintDimensionRatio="1"
+                            app:layout_constraintEnd_toStartOf="@+id/tv_undefined5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_undefined5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:padding="2dp"
+                            android:text="灯光"
+                            android:textAlignment="center"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/iv_light"
+                            android:textIsSelectable="true"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Switch
+                            android:id="@+id/switch_light"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:checked="@{viewmodel.lightOn}"
+                            android:fontFamily="serif"
+                            android:padding="2dp"
+                            android:textAlignment="center"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="@+id/tv_undefined5"
+                            app:layout_constraintStart_toStartOf="@+id/tv_undefined5"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_undefined5"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                        <TextView
+                            android:id="@+id/tv_undefined10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:padding="2dp"
+                            android:text="自动"
+                            android:textAlignment="center"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/iv_light"
+                            android:textIsSelectable="true"
+                            app:layout_constraintTop_toBottomOf="@id/switch_light" />
+
+                        <Switch
+                            android:id="@+id/switch_light_auto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:checked="@{viewmodel.lightControlAuto}"
+                            android:fontFamily="serif"
+                            android:padding="2dp"
+                            android:textAlignment="center"
+                            android:textSize="18sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="@+id/tv_undefined5"
+                            app:layout_constraintStart_toStartOf="@+id/tv_undefined5"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_undefined10"
+
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+
                 <!--安防（右边第二个方块）的布局-->
 
                 <!--净水（右边第三个方块）的布局-->
 
                 <!--除尘（左边第四个方块）的布局-->
 
+
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 

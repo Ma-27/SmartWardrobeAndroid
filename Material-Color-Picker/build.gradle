@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 34  // 指定编译使用的 SDK 版本
+
+    defaultConfig {
+        minSdkVersion 21  // 最低支持的 Android 版本
+        targetSdkVersion 34  // 目标 Android 版本
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // 可选：配置 lint 选项
+    lintOptions {
+        abortOnError true
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    testImplementation 'junit:junit:4.12'
+}
+
+
+group = 'com.turki-alkhateeb'
+description = 'An android material design based color picker dialog'
+
+ext {
+    publishedGroupId = 'com.turki-alkhateeb'
+    libraryName = 'Material Color Picker'
+    artifact = 'materialcolorpicker'
+    libraryDescription = 'An android material design based color picker dialog'
+    siteUrl = 'https://github.com/TurkiAlkhatib/Material-Color-Picker'
+    gitUrl = 'https://github.com/TurkiAlkhatib/Material-Color-Picker.git'
+    libraryVersion = '1.0.1'
+    developerId = 'TurkiAlkhatib'
+    developerName = 'Turki Alkhateeb'
+    developerEmail = 'turki.khateeb@gmail.com'
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+// apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/installv.gradle'
+// apply from: 'https://raw.githubusercontent.com/numetriclabz/jcenter/master/bintrayv.gradle'

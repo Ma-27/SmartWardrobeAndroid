@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.SmartWardrobe.CustomStatusBar" parent="Theme.SmartWardrobe.NoActionBar">
+        <!-- 设置状态栏颜色 -->
+        <item name="android:statusBarColor">@color/background_green</item>
+        <!-- 如果背景颜色较亮，设置状态栏图标颜色为深色 -->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

@@ -12,6 +12,8 @@
     <dimen name="space10">10dp</dimen>
     <dimen name="space15">15dp</dimen>
     <dimen name="space20">20dp</dimen>
+    <dimen name="space25">25dp</dimen>
+    <dimen name="space30">30dp</dimen>
 
     <dimen name="h1">18sp</dimen>
     <dimen name="h2">16sp</dimen>

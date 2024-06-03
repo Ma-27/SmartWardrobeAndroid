@@ -3,17 +3,20 @@
     <!-- Primary and secondary colors inspired by the background color -->
     <color name="primaryColor">#E8B4A0</color> <!-- A muted pink, harmonious with the background -->
     <color name="primaryDarkColor">#C98C7E</color> <!-- A darker shade of the primary color -->
-    <color name="secondaryColor">#A5DE40</color> <!-- A vibrant green for accents -->
+    <color name="secondaryColor">@color/transparent</color> <!-- A vibrant green for accents -->
 
     <!-- Neutral colors for text and backgrounds -->
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="greyLight">#F5F5F5</color>
-    <color name="colorGreen">#00FF00</color>
+    <color name="green">#00FF00</color>
     <color name="greyDark">#333333</color>
+    <color name="blue_custom">#2196F3</color>
+    <color name="yellow_custom">#FDD835</color>
+    <color name="transparent">#00000000</color>
 
 
-    <color name="colorAccent">#333333</color>
+    <color name="colorAccent">#FFEE58</color>
 
     <!-- Supporting colors for information, warnings, and success messages -->
     <color name="infoColor">#62B1F6</color> <!-- Light blue for informational text -->
@@ -22,7 +25,9 @@
     <color name="errorColor">#d9534f</color> <!-- Red for errors -->
 
     <!-- The original background color -->
-    <color name="background">#FFF6E4</color>
+    <color name="background_green">#FFF6E4</color>
+    <color name="background">#FAFAFA</color>
+    <color name="background_heavy">#C5E1A5</color>
     <color name="navColor">#00FF00</color>
 
     <!-- Additional shades for UI elements like buttons or highlights -->
@@ -39,4 +44,14 @@
 
     <color name="colorTextHint">#e1e1e1</color>
     <color name="colorTextInfo">#9b9b9b</color>
+
+    <color name="colorProgress">@color/white</color>
+    <color name="colorTrack">@color/blue_custom</color>
+
+    <color name="green_heavy">#1B5E20</color>
+    <color name="green_moderate">#A5D6A7</color>
+
+    <color name="app_bar_text_color">@color/green_heavy</color>
+
+
 </resources>

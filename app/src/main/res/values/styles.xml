@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CustomMaterialButtonTemperature" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/blue_custom</item>
+        <item name="android:textColor">@drawable/temperature_text_color_selector</item>
+        <item name="backgroundTint">@drawable/temperature_button_background_selector</item>
+        <item name="rippleColor">@color/blue_custom</item>
+        <item name="background">@drawable/temperature_button_background_selector</item>
+    </style>
+
+    <style name="CustomMaterialButtonHumidity" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/stroke_color_selector</item>
+        <item name="android:textColor">@drawable/humidity_text_color_selector</item>
+        <item name="backgroundTint">@drawable/humidity_button_background_selector</item>
+        <item name="rippleColor">@color/yellow_custom</item>
+        <item name="background">@drawable/humidity_button_background_selector</item>
+    </style>
+
+    <style name="CheckBoxTheme">
+        <item name="colorAccent">@color/green_heavy</item><!--选中颜色-->
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <!-- 自定义AppBarLayout的样式 -->
+    <style name="CustomAppBarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">@color/app_bar_text_color</item>
+        <item name="titleTextColor">@color/app_bar_text_color</item>
+        <item name="subtitleTextColor">@color/app_bar_text_color</item>
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:textColorHint">@color/background</item>
+    </style>
+</resources>

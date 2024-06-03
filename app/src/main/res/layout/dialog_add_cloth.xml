@@ -1,0 +1,200 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 衣物名称 -->
+        <TextView
+            android:id="@+id/tv_add_cloth_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="衣物名称："
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textIsSelectable="true"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_add_cloth_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_add_cloth_name"
+            android:layout_marginTop="8dp"
+            android:hint="请输入衣物名称"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_add_cloth_name" />
+
+        <!-- 衣物颜色 -->
+        <TextView
+            android:id="@+id/tv_cloth_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_add_cloth_name"
+            android:text="衣物的颜色是？"
+            android:textIsSelectable="true"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_add_cloth_name" />
+
+        <!-- 颜色选择按钮和颜色显示视图 -->
+        <Button
+            android:id="@+id/btn_color_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/background_green"
+            android:text="选择颜色"
+            android:textColor="@color/green_heavy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_cloth_color" />
+
+        <View
+            android:id="@+id/view_selected_color1"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/btn_color_picker"
+            app:layout_constraintStart_toEndOf="@id/btn_color_picker"
+            app:layout_constraintTop_toTopOf="@id/btn_color_picker" />
+
+        <View
+            android:id="@+id/view_selected_color2"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/btn_color_picker"
+            app:layout_constraintStart_toEndOf="@id/view_selected_color1"
+            app:layout_constraintTop_toTopOf="@id/btn_color_picker" />
+
+        <View
+            android:id="@+id/view_selected_color3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@id/btn_color_picker"
+            app:layout_constraintStart_toEndOf="@id/view_selected_color2"
+            app:layout_constraintTop_toTopOf="@id/btn_color_picker" />
+
+        <!-- 衣物类别 -->
+        <TextView
+            android:id="@+id/tv_cloth_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="衣物类别："
+            android:textIsSelectable="true"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_color_picker" />
+
+        <Spinner
+            android:id="@+id/spinner_cloth_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_below="@id/tv_cloth_category"
+            app:layout_constraintStart_toEndOf="@id/tv_cloth_category"
+            android:entries="@array/cloth_category"
+            app:layout_constraintTop_toBottomOf="@id/tv_cloth_category" />
+
+
+        <!-- 衣物款式 -->
+        <TextView
+            android:id="@+id/tv_cloth_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="衣物款式："
+            android:textIsSelectable="true"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinner_cloth_category" />
+
+        <EditText
+            android:id="@+id/et_cloth_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="请输入衣物款式"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_cloth_style" />
+
+        <!-- 衣物材质 -->
+        <TextView
+            android:id="@+id/textViewMaterial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="衣物材质："
+            android:textIsSelectable="true"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_cloth_style" />
+
+        <EditText
+            android:id="@+id/et_material"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="请输入衣物材质"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewMaterial" />
+
+        <!-- 衣物尺寸 -->
+        <TextView
+            android:id="@+id/tv_cloth_labels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="你对这件衣服的印象是？"
+            android:textIsSelectable="true"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_material" />
+
+        <EditText
+            android:id="@+id/et_labels"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="青春活力 | 清爽舒适"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_cloth_labels" />
+
+        <!-- 添加按钮 -->
+        <Button
+            android:id="@+id/btn_add_cloth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/background_green"
+            android:fontFamily="serif"
+            android:text="添加衣物"
+            android:textColor="@color/green_heavy"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_labels" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

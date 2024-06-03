@@ -13,8 +13,15 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.mamh.smartwardrobe.data.database.SmartWardrobeDatabase
+import com.mamh.smartwardrobe.data.database.user.UserEntity
 import com.mamh.smartwardrobe.databinding.ActivityLoginBinding
 import com.mamh.smartwardrobe.ui.main.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
 
 // 主Activity类用于处理登录
 class LoginActivity : AppCompatActivity() {
@@ -36,6 +43,14 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.editPassword
         val login = binding.btnLogin
         val touristMode = binding.btnTouristMode
+
+        // 获取数据库单例
+        val database = SmartWardrobeDatabase.getInstance(application)
+
+        // 确认数据库
+        Timber.d("Database: ")
+        Timber.d(database.toString())
+        val userDao = database.userDao
 
         // 初始化ViewModel
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
@@ -62,10 +77,22 @@ class LoginActivity : AppCompatActivity() {
             val loginResult = it ?: return@Observer
 
             if (loginResult.error != null) {
-                showLoginFailed(loginResult.error) // 显示登录失败信息
+                // 显示登录失败信息
+                showLoginFailed(loginResult.error)
             }
+
             if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success) // 更新UI显示成功信息
+                // 更新数据库中的用户信息
+                CoroutineScope(Dispatchers.IO).launch {
+                    userDao.insertUser(
+                        UserEntity(
+                            username = loginResult.success.displayName,
+                            password = password?.text.toString()
+                        )
+                    )
+                }
+                // 更新UI显示成功信息
+                updateUiWithUser(loginResult.success)
             }
             setResult(Activity.RESULT_OK)
 

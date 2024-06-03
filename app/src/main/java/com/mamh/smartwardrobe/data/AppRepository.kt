@@ -4,13 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mamh.smartwardrobe.bean.flag.TestFlag
 import com.mamh.smartwardrobe.bean.flag.TransmissionStatus
+import com.mamh.smartwardrobe.bean.item.ClothItem
 import com.mamh.smartwardrobe.bean.item.DataItem
 import com.mamh.smartwardrobe.bean.item.WifiItem
+import com.mamh.smartwardrobe.bean.netpacket.DailyWeatherResponse
+import com.mamh.smartwardrobe.bean.netpacket.UsefulDailyWeatherDetail
 import com.mamh.smartwardrobe.network.Connection
 import com.mamh.smartwardrobe.network.NetWorkServiceFactory
 import com.mamh.smartwardrobe.network.Transmission
+import com.mamh.smartwardrobe.network.internet.CaiyunWeatherApi
+import com.mamh.smartwardrobe.util.itembuild.WeatherTransferObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
 app repository是整个app的数据中心，所有app的全局数据都暂存在这里。
@@ -33,6 +39,8 @@ class AppRepository private constructor(
                 }
             }
         }
+
+        private val WEATHER_API_TOKEN = "9XGgTK1gcGYEy4Ic"
     }
 
 
@@ -65,16 +73,17 @@ class AppRepository private constructor(
 
 
     /**
-     * --------------------------------------------------------------------------------------------------------------------------------------------------------
-     * 这里正式进入存储数据的部分
+     * --------------------这里正式进入存储数据的部分-----------------------------------------------------------------
      */
 
     /// SnackBar提示字符串变量
     private val _userHint = MutableLiveData<String>().apply {
-        value = "Welcome to smart wardrobe!"
+        value = "欢迎使用智能衣柜!"
     }
     val userHint: LiveData<String>
         get() = _userHint
+
+    /// ------------------------- 互联网-物联网数据传输控制部分------------------------------------------------------------------------------------------------------------
 
     /// 标记是否有新的刷新命令
     private var newDataQuery = false
@@ -104,20 +113,36 @@ class AppRepository private constructor(
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
 
+
+    /// ------------------------- 其他网络API和服务部分--------------------------------------------------------------------
+    //要发送的数据缓存（相比起数据列表更容易access）
+    private val _latlng = MutableLiveData<String>().apply {
+        //默认值为TestFlag.SEND
+        value = "106.5518,29.7425"
+
+    }
+    val latlng: LiveData<String>
+        get() = _latlng
+
+
+    // 缓存天气数据
+    private val _usefulDailyWeatherDetail = MutableLiveData<UsefulDailyWeatherDetail>().apply {
+        //默认值为TestFlag.SEND
+        value = UsefulDailyWeatherDetail()
+    }
+    val usefulDailyWeatherDetail: LiveData<UsefulDailyWeatherDetail>
+        get() = _usefulDailyWeatherDetail
+
+
+    /// ------------------------- 传感器数据部分--------------------------------------------------------------------
+
+
     //缓存温度调节的当前温度
     private val _currentTemperature = MutableLiveData<Float>().apply {
         value = 13.8f
     }
     val currentTemperature: LiveData<Float>
         get() = _currentTemperature
-
-
-    //缓存温度调节的目标温度
-    private val _targetTemperature = MutableLiveData<Int>().apply {
-        value = 15
-    }
-    val targetTemperature: LiveData<Int>
-        get() = _targetTemperature
 
 
     // 存储当前亮度的数据
@@ -171,7 +196,21 @@ class AppRepository private constructor(
         get() = _lightControlAuto
 
 
-    //-------------------各自字段的setter方法--------------------------------------------------------------------------------------------------------------------------
+    /// ------------------------- 衣物数据部分--------------------------------------------------------------------
+
+    // 衣物列表
+    private val _clothList = MutableLiveData<List<ClothItem>>().apply {
+        value = emptyList<ClothItem>()
+    }
+    var clothList: LiveData<List<ClothItem>> = _clothList
+
+
+    /**
+     * =========================各自字段的setter方法===================================================================================
+     */
+
+    /// --------------------- 互联网-物联网数据传输控制部分-----------------------------------------------------------------------------
+
     fun setNewDataQuery(value: Boolean) {
         newDataQuery = value
     }
@@ -180,12 +219,168 @@ class AppRepository private constructor(
         return newDataQuery
     }
 
-    // 设置目标温度
-    fun setTargetTemperature(temperature: Int) {
-        _targetTemperature.value = temperature
+    //更改接收缓存，提示收到数据了
+    fun setDataReceiveCache(data: String) {
+        _dataReceiveCache.postValue(data)
+        //Timber.d("接收缓存收到数据$data")
+    }
+
+    //更改发送缓存，发送缓存收到更改后，应安排发送数据
+    fun setDataSendCache(data: String) {
+        _dataSendCache.postValue(data)
+    }
+
+    //在数据中心的数据列表中添加数据
+    // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
+    fun addDataItemToList(dataItem: DataItem) {
+        mdataList.add(dataItem)
+        _dataList.postValue(mdataList)
     }
 
 
+    /// 预留其他类access该类并修改数据的接口，通常从view model类中access此类
+    //检查网络状态
+    fun checkNetWorkState() {
+        //调用网络模块进行刷新
+        connection?.checkNetworkState()
+    }
+
+    //连接到指定wifi，wifiItem中含有wifi参数
+    fun connectToSpecifiedWifi(item: WifiItem) {
+        connection?.connect(item)
+    }
+
+    //断开与现在的wifi的连接
+    fun disConnectWifi() {
+        connection?.disconnect()
+    }
+
+    //提醒repository，设备已经接收到网络发来的数据了
+    suspend fun notifyDataReceiving() {
+        /// 启动一个新的接收数据线程
+        withContext(Dispatchers.IO) {
+            transmission?.onReceiveData()
+        }
+    }
+
+    //提醒repository socket已经改变
+    suspend fun notifySocketChanged() {
+        //在本app中，socket是连接的最后一步，如果成功生成或者更改了socket，则可以监听数据发送，这里需要提示刷新数据
+        notifyDataReceiving()
+    }
+
+    //向目标主机发送数据
+    suspend fun sendDataToServer() {
+        withContext(Dispatchers.IO) {
+            //发送数据
+            val status = transmission?.onSendData()
+            //报告发送状态
+            setUserHint(
+                when (status) {
+                    TransmissionStatus.SUCCESS -> "命令发送成功"
+                    TransmissionStatus.FAIL -> "命令发送失败"
+                    TransmissionStatus.SOCKET_NULL -> "端口为空"
+                    TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
+                    TransmissionStatus.DEVICE_NOT_ONLINE -> "设备不在线，请检查设备的电源或网络"
+                    TransmissionStatus.INVALID_JSON -> "服务器似乎返回了无效的数据"
+                    TransmissionStatus.UNKNOWN -> "未知的网络请求状态"
+                    else -> {
+                        "未知的网络请求状态"
+                    }
+                }
+            )
+        }
+    }
+
+
+    /// ------------------------- 其他网络API和服务部分--------------------------------------------------------------------
+
+    // 更新经纬度
+    fun setLatLng(value: String) {
+        _latlng.postValue(value)
+    }
+
+
+    // 向服务器请求天气数据
+    suspend fun updateWeatherFromRemote(): UsefulDailyWeatherDetail? {
+        // 使用Dispatchers.IO确保网络请求在IO线程执行
+        return withContext(Dispatchers.IO) {
+            try {
+                // 获取每日天气
+                // latlng.value!! 必不为空
+                val dailyWeatherResponse: DailyWeatherResponse? =
+                    CaiyunWeatherApi.retrofitService.getDailyWeather(
+                        WEATHER_API_TOKEN,
+                        latlng.value!!
+                    )
+
+                if (dailyWeatherResponse != null) {
+                    Timber.d("成功获取当日天气数据: $dailyWeatherResponse")
+                    // 提取有用的天气数据（全局需要使用）
+                    return@withContext extractDailyWeatherDetails(dailyWeatherResponse)
+                } else {
+                    Timber.e("获取天气数据失败: 响应为空")
+                    return@withContext null
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "获取天气数据时出错")
+                return@withContext null
+            }
+        }
+    }
+
+
+    //  提取天气API中每日需要的数据
+    private fun extractDailyWeatherDetails(response: DailyWeatherResponse): UsefulDailyWeatherDetail {
+        val location = "Lat: ${response.location[0]}, Lon: ${response.location[1]}"
+
+        val temperature = response.result.daily.temperature.firstOrNull()
+        val temperatureAvg = temperature?.avg?.toInt() ?: 0
+
+        val humidity = response.result.daily.humidity.firstOrNull()
+        val humidityAvg = (humidity?.avg ?: 0).toInt()
+
+        val pm25 = response.result.daily.air_quality.pm25.firstOrNull()
+        val pm25Avg = (pm25?.avg ?: 0).toInt()
+
+        val dressing = response.result.daily.life_index.dressing.firstOrNull()
+        val dressingIndex = dressing?.index?.toInt() ?: 0
+        val dressingAdvice = dressing?.desc ?: ""
+
+        val comfort = response.result.daily.life_index.comfort.firstOrNull()
+        val comfortIndex = comfort?.index?.toInt() ?: 0
+        val comfortDescription = comfort?.desc ?: ""
+
+        val skycon = response.result.daily.skycon.firstOrNull()
+        val weatherCondition = skycon?.value ?: "CLEAR"
+
+        return UsefulDailyWeatherDetail(
+            location = "重庆市 渝北区",// location,
+            temperature = temperatureAvg,
+            humidity = humidityAvg,
+            pm25 = pm25Avg,
+            dressingIndex = dressingIndex,
+            // 穿衣指数提示字符串
+            dressingAdvice = WeatherTransferObject.convertToDressingAdvice(dressingIndex),
+            comfortIndex = comfortIndex,
+            // 舒适指数提示字符串
+            comfortDescription = WeatherTransferObject.convertToComfortDescription(comfortIndex),
+            // 天气现象提示字符串(晴朗等）
+            weatherCondition = WeatherTransferObject.convertToPhenomenon(weatherCondition)
+        )
+    }
+
+
+    // 更新天气数据
+    fun setUsefulDailyWeatherDetail(value: UsefulDailyWeatherDetail) {
+        _usefulDailyWeatherDetail.value = value
+    }
+
+
+    /// ------------------------- 传感器数据部分-----------------------------------------------------------------------------
+
+
+    // 设置用户提示
     fun setUserHint(value: String) {
         _userHint.postValue(value)
     }
@@ -225,82 +420,26 @@ class AppRepository private constructor(
         _currentKnobValue.value = knobValue
     }
 
+    /// ------------------------- 衣物数据部分-----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------
 
-
-    //更改接收缓存，提示收到数据了
-    fun setDataReceiveCache(data: String) {
-        _dataReceiveCache.postValue(data)
-        //Timber.d("接收缓存收到数据$data")
+    // 添加衣物数据的方法
+    fun addCloth(item: ClothItem) {
+        val currentList = _clothList.value?.toMutableList() ?: mutableListOf()
+        currentList.add(item)
+        _clothList.value = currentList.toList()
     }
 
-    //更改发送缓存，发送缓存收到更改后，应安排发送数据
-    fun setDataSendCache(data: String) {
-        _dataSendCache.postValue(data)
+    // 删除指定的 ClothItem
+    fun removeClothItem(item: ClothItem) {
+        val currentList = _clothList.value?.toMutableList() ?: mutableListOf()
+        currentList.remove(item)
+        _clothList.value = currentList
     }
 
-    //在数据中心的数据列表中添加数据
-    // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
-    fun addDataItemToList(dataItem: DataItem) {
-        mdataList.add(dataItem)
-        _dataList.postValue(mdataList)
+    fun setClothList(value: List<ClothItem>) {
+        // 更新 ViewModel 中的 LiveData
+        _clothList.value = value
     }
 
-
-    /***
-     * 预留其他类access该类并修改数据的接口，通常从view model类中access此类
-     */
-    //检查网络状态
-    fun checkNetWorkState() {
-        //调用网络模块进行刷新
-        connection?.checkNetworkState()
-    }
-
-    //连接到指定wifi，wifiItem中含有wifi参数
-    fun connectToSpecifiedWifi(item: WifiItem) {
-        connection?.connect(item)
-    }
-
-    //断开与现在的wifi的连接
-    fun disConnectWifi() {
-        connection?.disconnect()
-    }
-
-    //提醒repository，设备已经接收到网络发来的数据了
-    suspend fun notifyDataReceiving() {
-        /// 启动一个新的接收数据线程
-        withContext(Dispatchers.IO) {
-            transmission?.onReceiveData()
-        }
-    }
-
-    //提醒repository socket已经改变
-    suspend fun notifySocketChanged() {
-        //在本app中，socket是连接的最后一步，如果成功生成或者更改了socket，则可以监听数据发送，这里需要提示刷新数据
-        notifyDataReceiving()
-    }
-
-    //向目标主机发送数据
-    suspend fun sendDataToServer() {
-        withContext(Dispatchers.IO) {
-            //发送数据
-            val status = transmission?.onSendData()
-            //报告发送状态
-            setUserHint(
-                when (status) {
-                    TransmissionStatus.SUCCESS -> "数据发送成功"
-                    TransmissionStatus.FAIL -> "数据发送失败"
-                    TransmissionStatus.SOCKET_NULL -> "端口为空"
-                    TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
-                    TransmissionStatus.DEVICE_NOT_ONLINE -> "设备不在线，请检查设备的电源或网络"
-                    TransmissionStatus.INVALID_JSON -> "服务器似乎返回了无效的数据"
-                    TransmissionStatus.UNKNOWN -> "未知的网络请求状态"
-                    else -> {
-                        "未知的网络请求状态"
-                    }
-                }
-            )
-        }
-    }
 }
