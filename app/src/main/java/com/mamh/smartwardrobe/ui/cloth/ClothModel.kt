@@ -84,11 +84,11 @@ object ClothModel {
 
         // 计算原始总分，是通过sigmoid非线性后加权平均的分数
         val originalTotalScore = (
-                customSigmoid(dressingScore * dressingIndexWeight) +
-                        customSigmoid(temperatureScore * temperatureWeight) +
-                        customSigmoid(humidityScore * humidityWeight) +
-                        customSigmoid(wearHistoryScore * wearHistoryWeight)
-                ) / 4.0
+                customSigmoid(dressingScore) * dressingIndexWeight +
+                        customSigmoid(temperatureScore) * temperatureWeight +
+                        customSigmoid(humidityScore) * humidityWeight +
+                        customSigmoid(wearHistoryScore) * wearHistoryWeight
+                )
 
         Timber.d("originalTotalScore: $originalTotalScore")
 
@@ -97,8 +97,8 @@ object ClothModel {
         Timber.d("totalScore: $finalScore")
 
         // 二次重映射并处理异常
-        finalScore = remapScore(finalScore)
-        Timber.d("finalScore: $finalScore")
+        // finalScore = remapScore(finalScore)
+        // Timber.d("finalScore: $finalScore")
 
         Timber.d("==========================================================================================")
 
@@ -253,7 +253,8 @@ object ClothModel {
         val b = 10.0
         val d = 0.2
 
-        val result = a / (1 + Math.exp(-b * x)) + d
+        // 更新数学表达式以符合新的函数形式
+        val result = a / (1 + Math.exp(-b * (2 * x - 1))) + d
         Timber.d("customSigmoid output: $result")
 
         return result
