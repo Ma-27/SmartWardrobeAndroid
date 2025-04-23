@@ -1,15 +1,42 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Android Studio 配置忽略项
+
+# 忽略所有模块的 IDE 配置
+**/*.iml
+**/.idea/
+!**/.idea/.gitignore        # 保留自身规则文件
+!**/.idea/codeStyles/        # 保留代码风格设置
+
+# 忽略所有 Gradle 编译产物
+**/.gradle/
+**/build/
+**/.cxx/
+**/.externalNativeBuild/
+
+# 忽略本地私有配置
+**/local.properties
+
+# 忽略截图、构建输出元数据
+captures/
+output-metadata.json
+*.apk
+
+# 忽略日志、临时文件
+*.log
+*.logcat
+*.tmp
+
+# 忽略操作系统垃圾文件
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
+ehthumbs.db
+
+# 保留 Gradle Wrapper 脚本与配置
+!gradlew
+!gradlew.bat
+!gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Git 忽略 Git 本身控制文件（勿删）
+!.gitignore
+
